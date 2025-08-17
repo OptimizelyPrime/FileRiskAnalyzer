@@ -1,6 +1,9 @@
+
 import math
 
 def calculate_file_health_score(func_metrics, raw_churn, raw_kc_pct):
+
+
     """
     Calculate a file health score based on maintainability, churn, and knowledge concentration.
     The formula is: Maintainability Score - Churn Score - Knowledge Concentration Score

@@ -1,4 +1,4 @@
-from utils.file_risk_utils import calculate_overall_risk
+from utils.file_risk_utils import calculate_file_health_score
 import os
 from arguments import parse_args
 from utils.repo_utils import clone_repo, find_source_files
@@ -58,48 +58,23 @@ def main():
             file_churn = churn_scores.get(file_name, 'N/A')
             file_kc = knowledge_concentration_scores.get(file_name, {})
             file_dev = file_kc.get('top_author', 'N/A')
-            file_kc_pct = file_kc.get('top_author_pct', 'N/A')
-            # Calculate file risk score
-            # AMS: average maintainability index for the file
-            # Weighted AMS: each function's maintainability index weighted by its LOC proportion
-            ams_vals = []
-            total_loc = 0
-            for m in func_metrics.values():
-                loc = m.get('lines_of_code')
-                if m.get('maintainability_index') not in (None, 'N/A') and loc not in (None, 'N/A'):
-                    ams_vals.append((m['maintainability_index'], loc))
-                    total_loc += loc
-            if ams_vals and total_loc > 0:
-                print(f"[DEBUG] {file_name} AMS values (score, loc): {ams_vals}")
-                print(f"[DEBUG] {file_name} total LOC: {total_loc}")
-                ams_score = sum(idx * (loc / total_loc) for idx, loc in ams_vals)
-                print(f"[DEBUG] {file_name} weighted AMS score: {ams_score}")
-                risk_weights = None  # use default
-            elif ams_vals:
-                print(f"[DEBUG] {file_name} AMS values (score, loc): {ams_vals}")
-                ams_score = sum(idx for idx, _ in ams_vals) / len(ams_vals)
-                print(f"[DEBUG] {file_name} unweighted AMS score: {ams_score}")
-                risk_weights = None  # use default
-            else:
-                ams_score = 0
-                print(f"[DEBUG] {file_name} has no functions, AMS score set to 0")
-                # If no functions, set quality weight to 0, distribute rest proportionally
-                risk_weights = {'quality': 0.0, 'churn': 0.5, 'kc': 0.5}
-            # Churn normalization (demo: divide by 10, cap at 1.0)
+            file_kc_pct = file_kc.get('top_author_pct', 0.0)
+            # Convert churn to int, default to 0
             try:
-                churn_norm = min(1.0, float(file_churn) / 10.0) if file_churn not in ('N/A', None) else 0.0
-            except Exception:
-                churn_norm = 0.0
-            # Knowledge concentration normalization (1 - top_author_pct/100)
+                churn_val = int(file_churn) if file_churn not in ('N/A', None) else 0
+            except (ValueError, TypeError):
+                churn_val = 0
+            # Convert kc_pct to float, default to 0.0
             try:
-                kc_norm = 1.0 - float(file_kc_pct) / 100.0 if file_kc_pct not in ('N/A', None) else 0.0
-            except Exception:
-                kc_norm = 0.0
-            file_risk = calculate_overall_risk(ams_score, churn_norm, kc_norm, weights=risk_weights)
+                kc_val = float(file_kc_pct) if file_kc_pct not in ('N/A', None) else 0.0
+            except (ValueError, TypeError):
+                kc_val = 0.0
+            # Calculate file health score using the new function
+            file_health = calculate_file_health_score(func_metrics, churn_val, kc_val)
             outfile.write(f"## {file_name}\n\n")
-            outfile.write("| Churn | Knowledge Score | Developer | File Risk |\n")
-            outfile.write("|-------|-----------------|-----------|-----------|\n")
-            outfile.write(f"| {file_churn} | {file_kc_pct}% | {file_dev} | {file_risk} |\n\n")
+            outfile.write("| Churn | Knowledge Score | Developer | File Health Score |\n")
+            outfile.write("|-------|-----------------|-----------|-------------------|\n")
+            outfile.write(f"| {churn_val} | {kc_val}% | {file_dev} | {file_health} |\n\n")
 
             # Function-level metrics
             for func_name, metrics in func_metrics.items():

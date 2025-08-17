@@ -10,6 +10,7 @@ def get_function_line_map(file_paths: List[str]) -> Dict[str, Dict[str, List[int
     Returns:
         Dict[str, Dict[str, List[int]]]: Mapping of file_path to function_name to list of line numbers.
     """
+    from maintainability_analyzer import analyze
     import os
     function_line_map = {}
     for file_path in file_paths:
@@ -70,7 +71,6 @@ Utility functions for calculating cyclomatic complexity using the lizard library
 """
 
 from typing import List, Dict, Any
-from maintainability_analyzer import analyze
 
 
 def analyze_file_complexity(file_path: str) -> Dict[str, Dict[str, Any]]:
@@ -83,6 +83,7 @@ def analyze_file_complexity(file_path: str) -> Dict[str, Dict[str, Any]]:
     Returns:
         Dict[str, Dict[str, Any]]: Dict mapping function name to metrics dict.
     """
+    from maintainability_analyzer import analyze
     complexity_data = {}
     with open(file_path, 'r', encoding='utf-8') as f:
         source_code = f.read()
@@ -113,7 +114,7 @@ def analyze_directory_complexity(directory_path: str, extensions: List[str] = ["
     Returns:
         Dict[str, Dict[str, Dict[str, Any]]]: Dict mapping file path to function-metrics dict.
     """
-    import os
+    from maintainability_analyzer import analyze
     import os
     complexity_data = {}
     for root, _, files in os.walk(directory_path):
@@ -145,3 +146,71 @@ def analyze_directory_complexity(directory_path: str, extensions: List[str] = ["
                 except Exception:
                     continue
     return complexity_data
+
+def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
+    """
+    Parses the content of a complexity report markdown file and returns a list of file metrics.
+
+    Args:
+        report_content (str): The content of the complexity report markdown file.
+
+    Returns:
+        List[Dict[str, Any]]: A list of dictionaries, where each dictionary represents a file
+                               and its complexity metrics.
+    """
+    import re
+
+    files_data = []
+
+    # Regex to split the report by file sections
+    file_sections = re.split(r'\n## ', report_content)
+
+    for section in file_sections:
+        if not section.strip():
+            continue
+
+        section = '## ' + section
+
+        file_match = re.search(r'## (.*)', section)
+        if not file_match:
+            continue
+
+        file_name = file_match.group(1).strip()
+
+        # Extract churn, knowledge score, and developer
+        churn_table_match = re.search(r'\| Churn \| Knowledge Score \| Developer \| File Risk \|\n\|-+\|-+\|--+\|-+\|\n\| (.*?) \| (.*?) \| (.*?) \|', section)
+        if not churn_table_match:
+            continue
+
+        churn = churn_table_match.group(1).strip()
+        knowledge_score = churn_table_match.group(2).strip()
+        developer = churn_table_match.group(3).strip()
+
+        # Find all function/unknown sections
+        function_sections = re.findall(r'\*\*(.*?)\*\*: Maintainability Index = ([\d.]+)\n\| Lines Of Code \| Halstead Volume \| Cyclomatic Complexity \|\n\|-+\|--+\|--+\|\n\| (.*?) \| (.*?) \| (.*?) \|', section)
+
+        functions_list = []
+        for func_match in function_sections:
+            func_name = func_match[0]
+            maintainability_index = float(func_match[1])
+            loc = int(func_match[2].strip())
+            halstead_volume = float(func_match[3].strip())
+            cyclomatic_complexity = int(float(func_match[4].strip()))
+
+            functions_list.append({
+                "function": func_name,
+                "maintainability_index": maintainability_index,
+                "length": loc,
+                "halstead_volume": halstead_volume,
+                "cyclomatic_complexity": cyclomatic_complexity
+            })
+
+        files_data.append({
+            "file": file_name,
+            "churn": int(churn),
+            "knowledge_score": knowledge_score,
+            "developer": developer,
+            "functions": functions_list
+        })
+
+    return files_data

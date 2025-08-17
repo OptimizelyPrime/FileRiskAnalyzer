@@ -1,5 +1,4 @@
 from utils.file_risk_utils import calculate_file_health_score
-
 import os
 from arguments import parse_args
 from utils.repo_utils import clone_repo, find_source_files
@@ -23,11 +22,8 @@ def main():
     source_files = find_source_files(repo_path)
     results = {}
 
-    from datetime import datetime
-    since_dt = datetime.fromtimestamp(args.since)
-
     # Extract file commit histories
-    file_histories = get_repo_files_commit_history(repo_path, since=since_dt)
+    file_histories = get_repo_files_commit_history(repo_path)
 
     # Calculate churn scores (file-level)
     churn_scores = calculate_repo_churn_scores(file_histories)
@@ -37,7 +33,7 @@ def main():
     authorship_data = get_repo_authorship(repo_path, source_files)
 
     # Calculate knowledge concentration scores (file-level)
-    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data, since=since_dt)
+    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data)
 
     import os
     for file_path in source_files:
@@ -64,7 +60,6 @@ def main():
             file_dev = file_kc.get('top_author', 'N/A')
             file_kc_pct = file_kc.get('top_author_pct', 0.0)
             # Convert churn to int, default to 0
-
             try:
                 churn_val = int(file_churn) if file_churn not in ('N/A', None) else 0
             except (ValueError, TypeError):
@@ -76,7 +71,6 @@ def main():
                 kc_val = 0.0
             # Calculate file health score using the new function
             file_health = calculate_file_health_score(func_metrics, churn_val, kc_val)
-
             outfile.write(f"## {file_name}\n\n")
             outfile.write("| Churn | Knowledge Score | Developer | File Health Score |\n")
             outfile.write("|-------|-----------------|-----------|-------------------|\n")

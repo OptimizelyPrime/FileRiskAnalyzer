@@ -5,5 +5,3 @@ pydantic
 python-dotenv
 langchain-core
 radon
-pandas
-langchain_openai

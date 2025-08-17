@@ -1,4 +1,5 @@
-from utils.file_risk_utils import calculate_file_risk
+from utils.file_risk_utils import calculate_file_health_score
+
 import os
 from arguments import parse_args
 from utils.repo_utils import clone_repo, find_source_files
@@ -61,23 +62,25 @@ def main():
             file_churn = churn_scores.get(file_name, 'N/A')
             file_kc = knowledge_concentration_scores.get(file_name, {})
             file_dev = file_kc.get('top_author', 'N/A')
-            file_kc_pct = file_kc.get('top_author_pct', 'N/A')
-            # Churn normalization (demo: divide by 10, cap at 1.0)
+            file_kc_pct = file_kc.get('top_author_pct', 0.0)
+            # Convert churn to int, default to 0
+
             try:
-                churn_norm = min(1.0, float(file_churn) / 10.0) if file_churn not in ('N/A', None) else 0.0
-            except Exception:
-                churn_norm = 0.0
-            # Knowledge concentration normalization (1 - top_author_pct/100)
+                churn_val = int(file_churn) if file_churn not in ('N/A', None) else 0
+            except (ValueError, TypeError):
+                churn_val = 0
+            # Convert kc_pct to float, default to 0.0
             try:
-                kc_norm = 1.0 - float(file_kc_pct) / 100.0 if file_kc_pct not in ('N/A', None) else 0.0
-            except Exception:
-                kc_norm = 0.0
-            # Calculate file risk score using the new function
-            file_risk = calculate_file_risk(func_metrics, churn_norm, kc_norm)
+                kc_val = float(file_kc_pct) if file_kc_pct not in ('N/A', None) else 0.0
+            except (ValueError, TypeError):
+                kc_val = 0.0
+            # Calculate file health score using the new function
+            file_health = calculate_file_health_score(func_metrics, churn_val, kc_val)
+
             outfile.write(f"## {file_name}\n\n")
-            outfile.write("| Churn | Knowledge Score | Developer | File Risk |\n")
-            outfile.write("|-------|-----------------|-----------|-----------|\n")
-            outfile.write(f"| {file_churn} | {file_kc_pct}% | {file_dev} | {file_risk} |\n\n")
+            outfile.write("| Churn | Knowledge Score | Developer | File Health Score |\n")
+            outfile.write("|-------|-----------------|-----------|-------------------|\n")
+            outfile.write(f"| {churn_val} | {kc_val}% | {file_dev} | {file_health} |\n\n")
 
             # Function-level metrics
             for func_name, metrics in func_metrics.items():

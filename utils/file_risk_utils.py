@@ -1,16 +1,21 @@
-def calculate_file_risk(func_metrics, churn_norm, kc_norm, weights=None):
+
+import math
+
+def calculate_file_health_score(func_metrics, raw_churn, raw_kc_pct):
+
+
     """
-    Calculate a holistic file risk score from code quality, churn, and knowledge concentration.
-    This function computes a weighted average of the maintainability index (MI) for all functions
-    in a file, and then combines it with churn and knowledge concentration scores.
+    Calculate a file health score based on maintainability, churn, and knowledge concentration.
+    The formula is: Maintainability Score - Churn Score - Knowledge Concentration Score
+    Higher scores are better.
     Args:
         func_metrics (dict): A dictionary of function-level metrics for a file.
-        churn_norm (float): Normalized churn (0-1)
-        kc_norm (float): Normalized knowledge concentration (0-1)
-        weights (dict): Dict with keys 'quality', 'churn', 'kc' summing to 1.0
+        raw_churn (int): The raw churn count for the file.
+        raw_kc_pct (float): The raw knowledge concentration percentage for the file.
     Returns:
-        float: Risk score (0-100, higher is riskier)
+        float: Health score (can be negative, higher is better)
     """
+    # 1. Calculate Maintainability Score (weighted average MI)
     ams_vals = []
     total_loc = 0
     for m in func_metrics.values():
@@ -21,41 +26,17 @@ def calculate_file_risk(func_metrics, churn_norm, kc_norm, weights=None):
 
     if ams_vals and total_loc > 0:
         ams_score = sum(idx * (loc / total_loc) for idx, loc in ams_vals)
-        risk_weights = weights
     elif ams_vals:
         ams_score = sum(idx for idx, _ in ams_vals) / len(ams_vals)
-        risk_weights = weights
     else:
         ams_score = 0
-        # If no functions, set quality weight to 0, distribute rest proportionally
-        risk_weights = {'quality': 0.0, 'churn': 0.5, 'kc': 0.5}
 
-    return _calculate_risk_from_scores(ams_score, churn_norm, kc_norm, weights=risk_weights)
+    # 2. Calculate scaled Churn and Knowledge Concentration scores
+    # Formula: 3.26 * ln(raw_value + 1)
+    scaled_churn = 3.26 * math.log(raw_churn + 1) if raw_churn > 0 else 0
+    scaled_kc = 3.26 * math.log(raw_kc_pct + 1) if raw_kc_pct > 0 else 0
 
+    # 3. Calculate final health score
+    health_score = ams_score - scaled_churn - scaled_kc
 
-def _calculate_risk_from_scores(ams_score, churn_norm, kc_norm, weights=None):
-    """
-    Calculate a holistic file risk score from code quality, churn, and knowledge concentration.
-    Args:
-        ams_score (float): Average maintainability score (0-100, higher is better)
-        churn_norm (float): Normalized churn (0-1)
-        kc_norm (float): Normalized knowledge concentration (0-1)
-        weights (dict): Dict with keys 'quality', 'churn', 'kc' summing to 1.0
-    Returns:
-        float: Risk score (0-100, higher is riskier)
-    """
-    if weights is None:
-        weights = {'quality': 0.50, 'churn': 0.25, 'kc': 0.25}
-    if not all(k in weights for k in ('quality', 'churn', 'kc')):
-        raise ValueError("Weights must have 'quality', 'churn', and 'kc' keys.")
-    if not abs(sum(weights.values()) - 1.0) < 1e-6:
-        raise ValueError("Weights must sum to 1.0")
-    ams_score = max(0, min(100, ams_score))
-    churn_norm = max(0, min(1, churn_norm))
-    kc_norm = max(0, min(1, kc_norm))
-    risk = (
-        weights['quality'] * (100 - ams_score)
-        + weights['churn'] * churn_norm * 100
-        + weights['kc'] * kc_norm * 100
-    )
-    return round(risk, 2)
+    return round(health_score, 2)

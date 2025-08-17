@@ -40,18 +40,6 @@ def main():
     with open(TEMPLATE_PATH, encoding="utf-8") as f:
         template = f.read()
 
-    # Replace the right-side label for file-level pills from 'File' to the file risk value
-    def file_risk_right_side(match):
-        return (f'{match.group(1)}' +
-                '${fileObj.file_risk !== undefined ? fileObj.file_risk.toFixed(2) : "--"}' +
-                match.group(2))
-
-    template = re.sub(
-        r'(<div class="risk-score"[^>]*>)[Ff]ile(</div>)',
-        file_risk_right_side,
-        template
-    )
-
     js_records = ",\n            ".join([
         json.dumps(rec, ensure_ascii=False) for rec in records_with_risk
     ])

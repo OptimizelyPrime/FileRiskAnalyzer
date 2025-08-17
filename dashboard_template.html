@@ -45,7 +45,7 @@
         .risk-item {
             display: flex;
             justify-content: flex-start;
-            align-items: flex-end;
+            align-items: flex-start;
             padding: 25px 25px 15px 25px;
             margin: 18px 0;
             border-radius: 16px;
@@ -248,13 +248,18 @@
                 ? '<span class="expand-indicator">+</span>'
                 : '<span class="expand-indicator" style="visibility:hidden;">+</span>';
 
+            const fileRiskScore = fileObj.file_risk !== undefined ? fileObj.file_risk.toFixed(2) : '--';
+            const fileRiskColor = getColorFromFileHealth(fileObj.file_risk);
             fileDiv.innerHTML = `
                 ${indicatorHTML}
                 <div class="risk-info">
                     <p class="method-name">${fileObj.file}</p>
                     <p class="file-name">Churn: ${fileObj.churn} &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score} (${fileObj.developer})</p>
                 </div>
-                <div class="risk-score" style="font-size:2em; text-align:right; min-width:90px;">File</div>
+                <div class="risk-score">
+                    <div style="font-size: 0.8em; opacity: 0.8;">File Risk Score</div>
+                    <div style="font-size: 2.0em; color: ${fileRiskColor}; font-weight: 700;">${fileRiskScore}</div>
+                </div>
             `;
             // Container for function-level pills
             const fnContainer = document.createElement('div');
@@ -323,6 +328,14 @@
                 modal.style.display = 'none';
             }
         });
+
+        // Function to determine the color based on file health score (lower = higher risk)
+        function getColorFromFileHealth(score) {
+            if (score === undefined || score === null) return '#333'; // Default color for score
+            if (score < 50) return '#d9534f'; // High Risk (Reddish)
+            if (score < 75) return '#f0ad4e'; // Medium Risk (Orangey)
+            return '#5cb85c'; // Low Risk (Greenish)
+        }
 
         // Function to determine the color based on maintainability index (lower = higher risk)
         function getColorFromMaintainability(index) {

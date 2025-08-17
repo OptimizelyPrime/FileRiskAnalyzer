@@ -130,14 +130,14 @@ def analyze_directory_complexity(directory_path: str, extensions: List[str] = ["
                             func_name = func.get('name', 'unknown')
                             file_func_metrics[func_name] = {
                                 'cyclomatic_complexity': func.get('cyclomatic_complexity'),
-                                'length': func.get('length'),
+                                'lines_of_code': func.get('length'),
                                 'parameters': func.get('parameters'),
                                 'maintenance_score': func.get('maintainability_index', metrics.get('maintainability_index')),
                             }
                     else:
                         file_func_metrics['unknown'] = {
                             'cyclomatic_complexity': metrics.get('cyclomatic_complexity'),
-                            'length': metrics.get('length'),
+                            'lines_of_code': metrics.get('length'),
                             'parameters': metrics.get('parameters'),
                             'maintenance_score': metrics.get('maintainability_index'),
                         }

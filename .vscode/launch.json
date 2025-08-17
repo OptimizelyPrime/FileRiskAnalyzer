@@ -11,8 +11,6 @@
             "program": "main.py",
             "console": "integratedTerminal",
             "args": [
-                "--github-username", "optimizelyprime",
-                "--github-token", "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",
                 "--repo-url", "https://github.com/OptimizelyPrime/ComplexCode"
             ]
         },

@@ -1,4 +1,4 @@
-from utils.file_risk_utils import calculate_overall_risk
+from utils.file_risk_utils import calculate_file_risk
 import os
 from arguments import parse_args
 from utils.repo_utils import clone_repo, find_source_files
@@ -22,8 +22,11 @@ def main():
     source_files = find_source_files(repo_path)
     results = {}
 
+    from datetime import datetime
+    since_dt = datetime.fromtimestamp(args.since)
+
     # Extract file commit histories
-    file_histories = get_repo_files_commit_history(repo_path)
+    file_histories = get_repo_files_commit_history(repo_path, since=since_dt)
 
     # Calculate churn scores (file-level)
     churn_scores = calculate_repo_churn_scores(file_histories)
@@ -33,7 +36,7 @@ def main():
     authorship_data = get_repo_authorship(repo_path, source_files)
 
     # Calculate knowledge concentration scores (file-level)
-    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data)
+    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data, since=since_dt)
 
     import os
     for file_path in source_files:
@@ -59,32 +62,6 @@ def main():
             file_kc = knowledge_concentration_scores.get(file_name, {})
             file_dev = file_kc.get('top_author', 'N/A')
             file_kc_pct = file_kc.get('top_author_pct', 'N/A')
-            # Calculate file risk score
-            # AMS: average maintainability index for the file
-            # Weighted AMS: each function's maintainability index weighted by its LOC proportion
-            ams_vals = []
-            total_loc = 0
-            for m in func_metrics.values():
-                loc = m.get('lines_of_code')
-                if m.get('maintainability_index') not in (None, 'N/A') and loc not in (None, 'N/A'):
-                    ams_vals.append((m['maintainability_index'], loc))
-                    total_loc += loc
-            if ams_vals and total_loc > 0:
-                print(f"[DEBUG] {file_name} AMS values (score, loc): {ams_vals}")
-                print(f"[DEBUG] {file_name} total LOC: {total_loc}")
-                ams_score = sum(idx * (loc / total_loc) for idx, loc in ams_vals)
-                print(f"[DEBUG] {file_name} weighted AMS score: {ams_score}")
-                risk_weights = None  # use default
-            elif ams_vals:
-                print(f"[DEBUG] {file_name} AMS values (score, loc): {ams_vals}")
-                ams_score = sum(idx for idx, _ in ams_vals) / len(ams_vals)
-                print(f"[DEBUG] {file_name} unweighted AMS score: {ams_score}")
-                risk_weights = None  # use default
-            else:
-                ams_score = 0
-                print(f"[DEBUG] {file_name} has no functions, AMS score set to 0")
-                # If no functions, set quality weight to 0, distribute rest proportionally
-                risk_weights = {'quality': 0.0, 'churn': 0.5, 'kc': 0.5}
             # Churn normalization (demo: divide by 10, cap at 1.0)
             try:
                 churn_norm = min(1.0, float(file_churn) / 10.0) if file_churn not in ('N/A', None) else 0.0
@@ -95,7 +72,8 @@ def main():
                 kc_norm = 1.0 - float(file_kc_pct) / 100.0 if file_kc_pct not in ('N/A', None) else 0.0
             except Exception:
                 kc_norm = 0.0
-            file_risk = calculate_overall_risk(ams_score, churn_norm, kc_norm, weights=risk_weights)
+            # Calculate file risk score using the new function
+            file_risk = calculate_file_risk(func_metrics, churn_norm, kc_norm)
             outfile.write(f"## {file_name}\n\n")
             outfile.write("| Churn | Knowledge Score | Developer | File Risk |\n")
             outfile.write("|-------|-----------------|-----------|-----------|\n")

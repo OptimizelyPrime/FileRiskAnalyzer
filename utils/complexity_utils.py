@@ -159,13 +159,14 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
                                and its complexity metrics.
     """
     import re
-
     files_data = []
 
     # Regex to split the report by file sections
     file_sections = re.split(r'\n## ', report_content)
+    for i, section in enumerate(file_sections):
+        if i == 0 and section.strip().startswith("# Repository Complexity and Maintainability Report"):
+            continue
 
-    for section in file_sections:
         if not section.strip():
             continue
 
@@ -178,13 +179,14 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
         file_name = file_match.group(1).strip()
 
         # Extract churn, knowledge score, and developer
-        churn_table_match = re.search(r'\| Churn \| Knowledge Score \| Developer \| File Risk \|\n\|-+\|-+\|--+\|-+\|\n\| (.*?) \| (.*?) \| (.*?) \|', section)
+        churn_table_match = re.search(r'\| Churn \| Knowledge Score \| Developer \| File Health Score \|\n\|-+\|-+\|-+\|-+\|\n\| (.*?) \| (.*?)% \| (.*?) \| (.*?) \|', section)
         if not churn_table_match:
             continue
 
         churn = churn_table_match.group(1).strip()
         knowledge_score = churn_table_match.group(2).strip()
         developer = churn_table_match.group(3).strip()
+        file_health = churn_table_match.group(4).strip()
 
         # Find all function/unknown sections
         function_sections = re.findall(r'\*\*(.*?)\*\*: Maintainability Index = ([\d.]+)\n\| Lines Of Code \| Halstead Volume \| Cyclomatic Complexity \|\n\|-+\|--+\|--+\|\n\| (.*?) \| (.*?) \| (.*?) \|', section)
@@ -210,6 +212,7 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
             "churn": int(churn),
             "knowledge_score": knowledge_score,
             "developer": developer,
+            "file_health": float(file_health),
             "functions": functions_list
         })
 

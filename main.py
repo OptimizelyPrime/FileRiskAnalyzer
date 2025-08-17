@@ -15,8 +15,8 @@ def main():
     args = parse_args()
 
     # Initialize OpenAI API
-    if not initialize_openai_api():
-        return
+    # if not initialize_openai_api():
+    #     return
 
     repo_path = clone_repo(args.repo_url, args.github_username, args.github_token)
     source_files = find_source_files(repo_path)

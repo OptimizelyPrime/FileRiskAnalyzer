@@ -12,6 +12,9 @@
 # Added to ignore the keys file containing secrets:
 keys.json
 
+# Ignore generated reports
+complexity_report.md
+
 # Python build files:
 *.pyc
 __pycache__/

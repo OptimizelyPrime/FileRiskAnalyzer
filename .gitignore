@@ -1,0 +1,22 @@
+# (BEGIN) Original .gitignore content
+# NOTE: Please re-add or merge any rules that existed before.
+# For example:
+# *.pyc
+# __pycache__/
+# dist/
+# build/
+# ... (etc.)
+
+# (END) Original .gitignore content
+
+# Added to ignore the keys file containing secrets:
+keys.json
+
+# Python build files:
+*.pyc
+__pycache__/
+dist/
+build/
+.eggs/
+*.egg-info
+pip-wheel-metadata/

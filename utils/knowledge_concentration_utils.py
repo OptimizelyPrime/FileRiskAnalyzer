@@ -1,0 +1,60 @@
+"""
+knowledge_concentration_utils.py
+Utility functions for scoring knowledge concentration risk using pandas.
+"""
+
+import pandas as pd
+from typing import List, Dict, Any
+
+
+def calculate_knowledge_concentration(authorship_data: List[Dict[str, str]]) -> Dict[str, Any]:
+    """
+    Calculate the percentage of lines owned by the top author and a risk score for a function.
+
+    Args:
+        authorship_data (List[Dict[str, str]]): List of line authorship dicts for a function.
+
+    Returns:
+        Dict[str, Any]: Dict with top author, percentage, and risk score (0-1).
+    """
+    df = pd.DataFrame(authorship_data)
+    if df.empty or 'author' not in df:
+        return {'top_author': None, 'top_author_pct': 0.0, 'risk_score': 0.0}
+    author_counts = df['author'].value_counts()
+    top_author = author_counts.idxmax()
+    top_author_pct = author_counts.max() / len(df)
+    # Risk score: higher percentage = higher risk (siloed knowledge)
+    risk_score = top_author_pct
+    return {
+        'top_author': top_author,
+        'top_author_pct': round(top_author_pct * 100, 2),
+        'risk_score': round(risk_score, 2)
+    }
+
+
+def calculate_repo_knowledge_concentration(authorship_data: Dict[str, Dict[str, List[Dict[str, str]]]]) -> Dict[str, Dict[str, Any]]:
+    """
+    Calculate knowledge concentration scores for all functions in all files in a repo.
+
+    Args:
+        authorship_data (Dict[str, Dict[str, List[Dict[str, str]]]]): Mapping of file paths to function names to line authorship data.
+
+    Returns:
+        Dict[str, Dict[str, Any]]: Mapping of file paths to function names to knowledge concentration scores.
+    """
+    import os
+    scores = {}
+    for file_path, func_map in authorship_data.items():
+        file_name = os.path.basename(file_path)
+        # If func_map is a list, treat as file-level authorship
+        if isinstance(func_map, list):
+            scores[file_name] = calculate_knowledge_concentration(func_map)
+        elif isinstance(func_map, dict):
+            # Merge all lines from all functions for file-level metric
+            all_lines = []
+            for lines in func_map.values():
+                all_lines.extend(lines)
+            scores[file_name] = calculate_knowledge_concentration(all_lines)
+        else:
+            scores[file_name] = {'top_author': None, 'top_author_pct': 0.0, 'risk_score': 0.0}
+    return scores

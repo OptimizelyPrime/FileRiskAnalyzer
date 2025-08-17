@@ -1,0 +1,7 @@
+GitPython
+openai
+langchain
+pydantic
+python-dotenv
+langchain-core
+radon

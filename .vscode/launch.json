@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "TDA",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--github-username", "optimizelyprime",
+                "--github-token", "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",
+                "--repo-url", "https://github.com/OptimizelyPrime/ComplexCode"
+            ]
+        },
+        {
+            "name": "Generate Dashboard",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "generate_dashboard_with_data.py",
+            "console": "integratedTerminal",
+            "args": []
+        }
+    ]
+}

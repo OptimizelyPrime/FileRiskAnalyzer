@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository Risk Analysis Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #1a202c;
+        }
+        
+        /* New styles for the risk items container */
+        #risk-items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* New styles for each risk item card */
+        .risk-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            padding: 25px 25px 15px 25px;
+            margin: 18px 0;
+            border-radius: 16px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .expand-indicator {
+            font-size: 2em;
+            margin-right: 18px;
+            transition: color 0.2s;
+            user-select: none;
+            width: 1em;
+            display: inline-block;
+            text-align: center;
+            align-self: center;
+        }
+        .expanded > .expand-indicator {
+            color: #5cb85c;
+        }
+        .fn-container {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s;
+        }
+        .fn-container.expanded {
+            max-height: 1000px;
+            opacity: 1;
+        }
+
+        .risk-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .risk-info {
+            align-self: center;
+        }
+        
+        .risk-info .method-name {
+            font-size: 2.0em;
+            font-weight: 700; /* Bold */
+            margin: 0 0 4px 0;
+        }
+
+        .risk-info .file-name {
+            font-size: 1.5em;
+            opacity: 0.85;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .risk-score {
+            font-size: 3.5em;
+            font-weight: 700; /* Bold */
+            margin-left: auto;
+            text-align: right;
+            min-width: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100%;
+        }
+
+        .function-metrics-main {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        .function-metrics-value {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .function-metrics-main-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            font-weight: 600;
+            margin-bottom: 2px;
+            text-align: right;
+        }
+        .function-metrics-main-value {
+            font-size: 3.0em;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Modal styles remain largely the same */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            color: #1a202c;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close:hover {
+            color: #333;
+        }
+        .pipe-separator {
+            margin: 0 10px;
+            opacity: 0.5;
+        }
+        .modal-content p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Repository Risk Dashboard</h1>
+        </div>
+        
+        <!-- The old table is replaced with this div -->
+        <div id="risk-items-container">
+            <!-- Risk items will be populated by JavaScript -->
+        </div>
+
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        // Example data structure reflecting new report format
+        const data = [
+            // Example:
+            // {
+            //   file: 'GameEngine.java',
+            //   churn: 1,
+            //   knowledge_score: '100.0%',
+            //   developer: 'Greg Jeffers',
+            //   functions: [
+            //     {
+            //       function: 'initializeWorld',
+            //       maintainability_index: 78.56,
+            //       halstead_volume: 1102.42,
+            //       cyclomatic_complexity: 1
+            //     }, ...
+            //   ]
+            // }
+            ||DATA||
+        ];
+
+        const riskItemsContainer = document.getElementById('risk-items-container');
+        const modal = document.getElementById('modal');
+        const modalBody = document.getElementById('modal-body');
+        const closeModal = document.getElementById('close-modal');
+
+        // Grouped by file, show file-level metrics, then function-level pills
+        data.forEach(fileObj => {
+            // File-level pill
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'risk-item';
+            fileDiv.style.backgroundColor = '#1a202c'; // Neutral color for file-level
+            fileDiv.style.cursor = 'pointer';
+
+            // Only show indicator if there are sub-items
+            let hasFunctions = fileObj.functions && Array.isArray(fileObj.functions) && fileObj.functions.length > 0;
+            let indicatorHTML = hasFunctions
+                ? '<span class="expand-indicator">+</span>'
+                : '<span class="expand-indicator" style="visibility:hidden;">+</span>';
+
+            fileDiv.innerHTML = `
+                ${indicatorHTML}
+                <div class="risk-info">
+                    <p class="method-name">${fileObj.file}</p>
+                    <p class="file-name">Churn: ${fileObj.churn} &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score} (${fileObj.developer})</p>
+                </div>
+                <div class="risk-score" style="font-size:2em; text-align:right; min-width:90px;">File</div>
+            `;
+            // Container for function-level pills
+            const fnContainer = document.createElement('div');
+            fnContainer.className = 'fn-container';
+            // Function-level pills
+            if (hasFunctions) {
+                fileObj.functions.forEach(fn => {
+                    const fnDiv = document.createElement('div');
+                    fnDiv.className = 'risk-item';
+                    fnDiv.style.marginLeft = '40px'; // Indent function-level pills
+                    // Use maintainability index for color (lower = higher risk)
+                    fnDiv.style.backgroundColor = getColorFromMaintainability(fn.maintainability_index);
+                    const maintainability = (fn.maintainability_index !== undefined && fn.maintainability_index !== null && !isNaN(fn.maintainability_index)) ? fn.maintainability_index.toFixed(2) : '--';
+                    const halstead = (fn.halstead_volume !== undefined && fn.halstead_volume !== null && !isNaN(fn.halstead_volume)) ? Number(fn.halstead_volume).toFixed(2) : '--';
+                    const cyclomatic = (fn.cyclomatic_complexity !== undefined && fn.cyclomatic_complexity !== null && !isNaN(fn.cyclomatic_complexity)) ? Number(fn.cyclomatic_complexity) : '--';
+                    const loc = (fn.length !== undefined && fn.length !== null && !isNaN(fn.length)) ? fn.length : '--';
+                    fnDiv.innerHTML = `
+                        <div class="risk-info">
+                            <p class="method-name">${fn.function}</p>
+                            <p class="file-name">${fileObj.file}</p>
+                        </div>
+                        <div style="margin-left: auto; text-align: right;">
+                            <div class="function-metrics-main">
+                                <div class="function-metrics-main-label">Maintainability Index</div>
+                                <div class="function-metrics-main-value">${maintainability}</div>
+                            </div>
+                            <div style="padding: 0px; margin-top: 5px;">
+                                <span title="Lines of Code" class="function-metrics-value">${loc}</span>
+                                <span class="pipe-separator">|</span>
+                                <span title="Halstead Volume" class="function-metrics-value">${halstead}</span>
+                                <span class="pipe-separator">|</span>
+                                <span title="Cyclomatic Complexity" class="function-metrics-value">${cyclomatic}</span>
+                            </div>
+                        </div>
+                    `;
+                    // No modal for function-level pills
+                    fnContainer.appendChild(fnDiv);
+                });
+            }
+            // Expand/collapse logic
+            if (hasFunctions) {
+                fileDiv.addEventListener('click', function(e) {
+                    // Only expand/collapse if not clicking a link or button inside
+                    if (e.target.closest('.expand-indicator') || e.target.closest('.risk-info') || e.target.closest('.risk-score')) {
+                        const expanded = fileDiv.classList.toggle('expanded');
+                        fnContainer.classList.toggle('expanded', expanded);
+                        const indicator = fileDiv.querySelector('.expand-indicator');
+                        if (indicator) {
+                            indicator.textContent = expanded ? '-' : '+';
+                        }
+                    }
+                });
+            }
+            riskItemsContainer.appendChild(fileDiv);
+            riskItemsContainer.appendChild(fnContainer);
+        });
+
+        // Function to close the modal
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Function to close the modal if clicking outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Function to determine the color based on maintainability index (lower = higher risk)
+        function getColorFromMaintainability(index) {
+            if (index === undefined) return '#888';
+            if (index < 50) return '#d9534f'; // High Risk (Reddish)
+            if (index < 75) return '#f0ad4e'; // Medium Risk (Orangey)
+            return '#5cb85c'; // Low Risk (Greenish)
+        }
+    </script>
+</body>
+</html>

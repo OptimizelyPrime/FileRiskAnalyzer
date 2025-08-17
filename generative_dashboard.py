@@ -25,23 +25,23 @@ def read_report(report_path):
 # --- Generate summary and HTML using OpenAI ---
 def generate_dashboard_with_openai(report_content):
     prompt = f"""
-You are an expert data parser. Given the following repository risk analysis report, extract and return a JSON array containing ALL records, one for each function in the report, in the following format:
-{{ file: "GameEngine.java", function: "startGame", cyclomatic_complexity: 12, churn_score: 0, knowledge_concentration_risk: "1.0 (Greg Jeffers)", debt_score: 0.60 }}
+You are an expert data parser. Given the following repository analysis report, extract and return a JSON array containing ALL records, one for each function in the report, in the following format:
+{{ "file": "GameEngine.java", "function": "startGame", "cyclomatic_complexity": 12, "churn_score": 0, "knowledge_score": "85% (Greg Jeffers)", "file_health_score": 75.5 }}
 
 Return a JSON array (not just one record, but an array of all records), for example:
 [
-  {{ file: "GameEngine.java", function: "startGame", cyclomatic_complexity: 12, churn_score: 0, knowledge_concentration_risk: "1.0 (Greg Jeffers)", debt_score: 0.60 }},
-  {{ file: "Parser.java", function: "parse", cyclomatic_complexity: 27, churn_score: 0, knowledge_concentration_risk: "1.0 (Greg Jeffers)", debt_score: 0.60 }}
+  {{ "file": "GameEngine.java", "function": "startGame", "cyclomatic_complexity": 12, "churn_score": 0, "knowledge_score": "85% (Greg Jeffers)", "file_health_score": 75.5 }},
+  {{ "file": "Parser.java", "function": "parse", "cyclomatic_complexity": 27, "churn_score": 5, "knowledge_score": "100% (Greg Jeffers)", "file_health_score": 45.0 }}
   // ...more records...
 ]
 
 Each record should represent a function from the report, with the following fields:
 - file: the file name (no path, just the file)
 - function: the function name
-- cyclomatic_complexity: integer
-- churn_score: integer or float
-- knowledge_concentration_risk: string (include the developer name in parentheses, e.g., "1.0 (Greg Jeffers)")
-- debt_score: float
+- cyclomatic_complexity: integer, from the function-level metrics table
+- churn_score: integer, from the file-level table
+- knowledge_score: string, combining the percentage and developer from the file-level table (e.g., "85% (Greg Jeffers)")
+- file_health_score: float, from the file-level table
 
 Return ONLY the JSON array, no explanation or extra text. Parse the report content below:
 {report_content}

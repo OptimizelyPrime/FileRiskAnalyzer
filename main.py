@@ -22,8 +22,11 @@ def main():
     source_files = find_source_files(repo_path)
     results = {}
 
+    from datetime import datetime
+    since_dt = datetime.fromtimestamp(args.since)
+
     # Extract file commit histories
-    file_histories = get_repo_files_commit_history(repo_path)
+    file_histories = get_repo_files_commit_history(repo_path, since=since_dt)
 
     # Calculate churn scores (file-level)
     churn_scores = calculate_repo_churn_scores(file_histories)
@@ -33,7 +36,7 @@ def main():
     authorship_data = get_repo_authorship(repo_path, source_files)
 
     # Calculate knowledge concentration scores (file-level)
-    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data)
+    knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data, since=since_dt)
 
     import os
     for file_path in source_files:

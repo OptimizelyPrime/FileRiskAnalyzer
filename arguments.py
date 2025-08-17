@@ -1,4 +1,5 @@
 import argparse
+import time
 
 def parse_args():
     """
@@ -11,4 +12,5 @@ def parse_args():
     parser.add_argument("--github-token", required=False, help="GitHub personal access token (optional for public repos)")
     parser.add_argument("--repo-url", required=True, help="Repository URL (HTTPS only)")
     parser.add_argument("--output", default="complexity_report.md", help="Output report file")
+    parser.add_argument("--since", type=float, default=time.time() - 2 * 7 * 24 * 60 * 60, help="Analyze data since this timestamp (default: 2 weeks ago)")
     return parser.parse_args()

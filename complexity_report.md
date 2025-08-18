@@ -1,21 +1,5 @@
 # Repository Complexity and Maintainability Report
 
-## generative_dashboard.py
-
-| Churn | Knowledge Score | Developer | File Health Score |
-|-------|-----------------|-----------|-------------------|
-| 2 | 88.57% | Greg Jeffers | 31.62 |
-
-**read_report**: Maintainability Index = 82.32107511111553
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 3 | 10.0 | 2 |
-
-**generate_dashboard_with_openai**: Maintainability Index = 47.63921217969609
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 44 | 199.68581616031315 | 3 |
-
 ## arguments.py
 
 | Churn | Knowledge Score | Developer | File Health Score |
@@ -43,11 +27,27 @@
 |---------------|-----------------|-----------------------|
 | 23 | 272.04693572714405 | 4 |
 
+## generative_dashboard.py
+
+| Churn | Knowledge Score | Developer | File Health Score |
+|-------|-----------------|-----------|-------------------|
+| 2 | 88.57% | Greg Jeffers | 31.62 |
+
+**read_report**: Maintainability Index = 82.32107511111553
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 3 | 10.0 | 2 |
+
+**generate_dashboard_with_openai**: Maintainability Index = 47.63921217969609
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 44 | 199.68581616031315 | 3 |
+
 ## complexity_schema.py
 
 | Churn | Knowledge Score | Developer | File Health Score |
 |-------|-----------------|-----------|-------------------|
-| 1 | 100.0% | Greg Jeffers | -17.3 |
+| 1 | 100.0% | Greg Jeffers | 82.7 |
 
 ## authorship_utils.py
 
@@ -65,22 +65,6 @@
 |---------------|-----------------|-----------------------|
 | 15 | 33.68825906469125 | 2 |
 
-## knowledge_concentration_utils.py
-
-| Churn | Knowledge Score | Developer | File Health Score |
-|-------|-----------------|-----------|-------------------|
-| 2 | 79.71% | Greg Jeffers | 33.15 |
-
-**calculate_knowledge_concentration**: Maintainability Index = 50.0264223576187
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 29 | 305.52858167917094 | 5 |
-
-**calculate_repo_knowledge_concentration**: Maintainability Index = 52.145267979785096
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 27 | 190.16483617504394 | 5 |
-
 ## churn_utils.py
 
 | Churn | Knowledge Score | Developer | File Health Score |
@@ -96,6 +80,32 @@
 | Lines Of Code | Halstead Volume | Cyclomatic Complexity |
 |---------------|-----------------|-----------------------|
 | 17 | 56.47277761308516 | 2 |
+
+## complexity_utils.py
+
+| Churn | Knowledge Score | Developer | File Health Score |
+|-------|-----------------|-----------|-------------------|
+| 4 | 65.3% | Greg Jeffers | 22.84 |
+
+**get_function_line_map**: Maintainability Index = 38.55038843592037
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 65 | 755.7015619358763 | 13 |
+
+**analyze_file_complexity**: Maintainability Index = 51.22836902884138
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 28 | 219.61587113893805 | 6 |
+
+**analyze_directory_complexity**: Maintainability Index = 44.8099116850915
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 43 | 435.98905644032214 | 8 |
+
+**parse_complexity_report**: Maintainability Index = 39.076726812797574
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 70 | 629.4467115454433 | 8 |
 
 ## debt_score_utils.py
 
@@ -124,6 +134,22 @@
 |---------------|-----------------|-----------------------|
 | 3 | 2.0 | 1 |
 
+## file_history_utils.py
+
+| Churn | Knowledge Score | Developer | File Health Score |
+|-------|-----------------|-----------|-------------------|
+| 2 | 84.21% | Greg Jeffers | 38.63 |
+
+**get_file_commit_history**: Maintainability Index = 55.97463992623636
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 23 | 101.57915548582149 | 2 |
+
+**get_repo_files_commit_history**: Maintainability Index = 57.58986928472385
+| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
+|---------------|-----------------|-----------------------|
+| 19 | 103.61231210795059 | 3 |
+
 ## file_risk_utils.py
 
 | Churn | Knowledge Score | Developer | File Health Score |
@@ -135,31 +161,21 @@
 |---------------|-----------------|-----------------------|
 | 37 | 459.03986486161926 | 7 |
 
-## complexity_utils.py
+## knowledge_concentration_utils.py
 
 | Churn | Knowledge Score | Developer | File Health Score |
 |-------|-----------------|-----------|-------------------|
-| 3 | 66.2% | Greg Jeffers | 23.95 |
+| 2 | 79.71% | Greg Jeffers | 33.15 |
 
-**get_function_line_map**: Maintainability Index = 38.55038843592037
+**calculate_knowledge_concentration**: Maintainability Index = 50.0264223576187
 | Lines Of Code | Halstead Volume | Cyclomatic Complexity |
 |---------------|-----------------|-----------------------|
-| 65 | 755.7015619358763 | 13 |
+| 29 | 305.52858167917094 | 5 |
 
-**analyze_file_complexity**: Maintainability Index = 51.22836902884138
+**calculate_repo_knowledge_concentration**: Maintainability Index = 52.145267979785096
 | Lines Of Code | Halstead Volume | Cyclomatic Complexity |
 |---------------|-----------------|-----------------------|
-| 28 | 219.61587113893805 | 6 |
-
-**analyze_directory_complexity**: Maintainability Index = 44.8099116850915
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 43 | 435.98905644032214 | 8 |
-
-**parse_complexity_report**: Maintainability Index = 40.25344332884006
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 67 | 535.2886063712457 | 6 |
+| 27 | 190.16483617504394 | 5 |
 
 ## repo_utils.py
 
@@ -176,22 +192,6 @@
 | Lines Of Code | Halstead Volume | Cyclomatic Complexity |
 |---------------|-----------------|-----------------------|
 | 14 | 69.18863237274594 | 4 |
-
-## file_history_utils.py
-
-| Churn | Knowledge Score | Developer | File Health Score |
-|-------|-----------------|-----------|-------------------|
-| 2 | 84.21% | Greg Jeffers | 38.63 |
-
-**get_file_commit_history**: Maintainability Index = 55.97463992623636
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 23 | 101.57915548582149 | 2 |
-
-**get_repo_files_commit_history**: Maintainability Index = 57.58986928472385
-| Lines Of Code | Halstead Volume | Cyclomatic Complexity |
-|---------------|-----------------|-----------------------|
-| 19 | 103.61231210795059 | 3 |
 
 
 

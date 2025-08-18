@@ -26,7 +26,7 @@ def calculate_file_health_score(func_metrics, raw_churn, raw_kc_pct):
     elif ams_vals:
         ams_score = sum(idx for idx, _ in ams_vals) / len(ams_vals)
     else:
-        ams_score = 0
+        ams_score = 100
 
     # 2. Calculate scaled Churn and Knowledge Concentration scores
     # Formula: 3.26 * ln(raw_value + 1)

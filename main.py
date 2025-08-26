@@ -10,6 +10,7 @@ from utils.authorship_utils import get_repo_authorship
 from utils.knowledge_concentration_utils import calculate_repo_knowledge_concentration
 from utils.debt_score_utils import calculate_debt_scores
 from time import sleep
+from generate_dashboard_with_data import generate_dashboard
 
 def main():
     args = parse_args()
@@ -97,6 +98,8 @@ def main():
         # outfile.write("\n# Final Debt Scores (Sorted)\n\n")
         # outfile.write(debt_scores_df.to_string(index=False))
         outfile.write("\n\n")
+
+    generate_dashboard()
 
 if __name__ == "__main__":
     main()

@@ -30,7 +30,7 @@ def add_risk_to_data(records):
 
     return records
 
-def main():
+def generate_dashboard():
     with open(REPORT_PATH, encoding="utf-8") as f:
         report_content = f.read()
 
@@ -55,4 +55,4 @@ def main():
     print(f"Dashboard written to: {out_path}")
 
 if __name__ == "__main__":
-    main()
+    generate_dashboard()

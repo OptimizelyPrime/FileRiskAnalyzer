@@ -183,6 +183,10 @@
             margin: 0 10px;
             opacity: 0.5;
         }
+
+        .selectable.selected {
+            box-shadow: 0 0 0 3px #007bff !important;
+        }
         .modal-content p {
             line-height: 1.6;
         }
@@ -199,6 +203,9 @@
             <!-- Risk items will be populated by JavaScript -->
         </div>
 
+        <div style="text-align: center; margin: 20px;">
+            <button id="prepare-post-btn" style="padding: 10px 20px; font-size: 1em; color: #fff; background-color: #007bff; border: none; border-radius: 5px; cursor: pointer;">Prepare POST Request</button>
+        </div>
     </div>
 
     <div class="modal" id="modal">
@@ -238,7 +245,8 @@
         data.forEach(fileObj => {
             // File-level pill
             const fileDiv = document.createElement('div');
-            fileDiv.className = 'risk-item';
+            fileDiv.className = 'risk-item selectable';
+            fileDiv.setAttribute('data-filename', fileObj.file);
             fileDiv.style.backgroundColor = '#1a202c'; // Neutral color for file-level
             fileDiv.style.cursor = 'pointer';
 
@@ -299,9 +307,10 @@
                     fnContainer.appendChild(fnDiv);
                 });
             }
-            // Expand/collapse logic
+            // Expand/collapse and selection logic
             if (hasFunctions) {
                 fileDiv.addEventListener('click', function(e) {
+                    this.classList.toggle('selected');
                     // Only expand/collapse if not clicking a link or button inside
                     if (e.target.closest('.expand-indicator') || e.target.closest('.risk-info') || e.target.closest('.risk-score')) {
                         const expanded = fileDiv.classList.toggle('expanded');
@@ -311,6 +320,11 @@
                             indicator.textContent = expanded ? '-' : '+';
                         }
                     }
+                });
+            } else {
+                // For files with no functions, they should still be selectable
+                fileDiv.addEventListener('click', function(e) {
+                    this.classList.toggle('selected');
                 });
             }
             riskItemsContainer.appendChild(fileDiv);
@@ -344,6 +358,23 @@
             if (index < 75) return '#f0ad4e'; // Medium Risk (Orangey)
             return '#5cb85c'; // Low Risk (Greenish)
         }
+
+        const preparePostBtn = document.getElementById('prepare-post-btn');
+        preparePostBtn.addEventListener('click', () => {
+            const selectedPills = document.querySelectorAll('.selectable.selected');
+            const selectedFiles = [];
+            selectedPills.forEach(pill => {
+                selectedFiles.push(pill.getAttribute('data-filename'));
+            });
+
+            const jsonOutput = JSON.stringify(selectedFiles, null, 2);
+            console.log('Preparing POST request with the following files:');
+            console.log(jsonOutput);
+
+            // For demonstration, we'll just log to the console.
+            // A real implementation would send a POST request.
+            alert('Selected files prepared for POST request. Check the browser console for the JSON data.');
+        });
     </script>
 </body>
 </html>

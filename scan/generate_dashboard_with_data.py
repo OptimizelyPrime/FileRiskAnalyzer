@@ -5,7 +5,7 @@ import json
 import time
 import re
 
-TEMPLATE_PATH = os.path.join(os.getcwd(), "dashboard_template.html")
+TEMPLATE_PATH = os.path.join(os.getcwd(), "scan/dashboard_template.html")
 REPORT_PATH = os.path.join(os.getcwd(), "complexity_report.md")
 
 def add_risk_to_data(records):

@@ -190,6 +190,25 @@
         .modal-content p {
             line-height: 1.6;
         }
+        #prepare-post-btn {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        #prepare-post-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -202,11 +221,9 @@
         <div id="risk-items-container">
             <!-- Risk items will be populated by JavaScript -->
         </div>
-
-        <div style="text-align: center; margin: 20px;">
-            <button id="prepare-post-btn" style="padding: 10px 20px; font-size: 1em; color: #fff; background-color: #007bff; border: none; border-radius: 5px; cursor: pointer;">Prepare POST Request</button>
-        </div>
     </div>
+
+    <button id="prepare-post-btn">Prepare POST Request</button>
 
     <div class="modal" id="modal">
         <div class="modal-content">

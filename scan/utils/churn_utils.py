@@ -24,6 +24,7 @@ def calculate_file_churn_score(commit_history: List[Dict[str, str]], since: Opti
     if since:
         since_dt = pd.to_datetime(since)
         if 'date' in df:
+            df['date'] = pd.to_datetime(df['date'])
             df = df[df['date'] >= since_dt]
     return df['commit_hash'].nunique() if 'commit_hash' in df else 0
 

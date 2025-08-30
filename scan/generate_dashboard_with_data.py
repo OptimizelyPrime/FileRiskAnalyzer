@@ -1,4 +1,4 @@
-from utils.file_risk_utils import calculate_file_health_score
+from utils.file_health_utils import calculate_file_health_score
 from utils.complexity_utils import parse_complexity_report
 import os
 import json
@@ -24,7 +24,7 @@ def add_risk_to_data(records):
         except (ValueError, AttributeError):
             raw_kc_pct = 0.0
 
-        record['file_risk'] = calculate_file_health_score(func_metrics_dict, raw_churn, raw_kc_pct)
+        record['file_health'] = calculate_file_health_score(func_metrics_dict, raw_churn, raw_kc_pct)
 
         record['lines_of_code'] = sum(f.get('length', 0) for f in record.get('functions', []))
 

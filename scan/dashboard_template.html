@@ -326,25 +326,33 @@
                 });
             }
             // Expand/collapse and selection logic
-            if (hasFunctions) {
-                fileDiv.addEventListener('click', function(e) {
-                    this.classList.toggle('selected');
+            fileDiv.addEventListener('click', function(e) {
+                const isSelected = this.classList.contains('selected');
+
+                // If the item is not selected, check if the limit has been reached.
+                if (!isSelected) {
+                    const selectedCount = document.querySelectorAll('.selectable.selected').length;
+                    if (selectedCount >= 3) {
+                        alert('You can only select up to 3 files.');
+                        return; // Prevent selection
+                    }
+                }
+
+                this.classList.toggle('selected');
+
+                // Expansion logic for items with functions
+                if (hasFunctions) {
                     // Only expand/collapse if not clicking a link or button inside
                     if (e.target.closest('.expand-indicator') || e.target.closest('.risk-info') || e.target.closest('.risk-score')) {
-                        const expanded = fileDiv.classList.toggle('expanded');
+                        const expanded = this.classList.toggle('expanded');
                         fnContainer.classList.toggle('expanded', expanded);
-                        const indicator = fileDiv.querySelector('.expand-indicator');
+                        const indicator = this.querySelector('.expand-indicator');
                         if (indicator) {
                             indicator.textContent = expanded ? '-' : '+';
                         }
                     }
-                });
-            } else {
-                // For files with no functions, they should still be selectable
-                fileDiv.addEventListener('click', function(e) {
-                    this.classList.toggle('selected');
-                });
-            }
+                }
+            });
             riskItemsContainer.appendChild(fileDiv);
             riskItemsContainer.appendChild(fnContainer);
         });

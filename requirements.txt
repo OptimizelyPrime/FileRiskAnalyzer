@@ -7,3 +7,4 @@ langchain-core
 radon
 pandas
 langchain_openai
+git+https://github.com/OptimizelyPrime/MainScoreCalc.git

@@ -17,6 +17,16 @@
             ]
         },
         {
+            "name": "Self-Scan",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--repo-url", "https://github.com/OptimizelyPrime/FileRiskAnalyzer"
+            ]
+        },
+        {
             "name": "Generate Dashboard",
             "type": "debugpy",
             "request": "launch",

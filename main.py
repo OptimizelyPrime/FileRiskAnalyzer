@@ -99,7 +99,7 @@ def main():
         # outfile.write(debt_scores_df.to_string(index=False))
         outfile.write("\n\n")
 
-    generate_dashboard()
+    generate_dashboard(args.repo_url)
 
 if __name__ == "__main__":
     main()

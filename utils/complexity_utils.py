@@ -10,7 +10,7 @@ def get_function_line_map(file_paths: List[str]) -> Dict[str, Dict[str, List[int
     Returns:
         Dict[str, Dict[str, List[int]]]: Mapping of file_path to function_name to list of line numbers.
     """
-    from maintainability_analyzer import analyze
+    from maintainability_score_analyzer import analyze
     import os
     function_line_map = {}
     for file_path in file_paths:
@@ -83,7 +83,7 @@ def analyze_file_complexity(file_path: str) -> Dict[str, Dict[str, Any]]:
     Returns:
         Dict[str, Dict[str, Any]]: Dict mapping function name to metrics dict.
     """
-    from maintainability_analyzer import analyze
+    from maintainability_score_analyzer import analyze
     complexity_data = {}
     with open(file_path, 'r', encoding='utf-8') as f:
         source_code = f.read()
@@ -114,7 +114,7 @@ def analyze_directory_complexity(directory_path: str, extensions: List[str] = ["
     Returns:
         Dict[str, Dict[str, Dict[str, Any]]]: Dict mapping file path to function-metrics dict.
     """
-    from maintainability_analyzer import analyze
+    from maintainability_score_analyzer import analyze
     import os
     complexity_data = {}
     for root, _, files in os.walk(directory_path):

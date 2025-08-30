@@ -52,7 +52,7 @@
             border-radius: 16px;
             color: white;
             cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
@@ -186,7 +186,8 @@
         }
 
         .selectable.selected {
-            box-shadow: 0 0 0 3px #007bff !important;
+            background-color: #2c3e50 !important;
+            box-shadow: 0 0 0 4px #4e9af1 !important;
         }
         .modal-content p {
             line-height: 1.6;
@@ -326,25 +327,33 @@
                 });
             }
             // Expand/collapse and selection logic
-            if (hasFunctions) {
-                fileDiv.addEventListener('click', function(e) {
-                    this.classList.toggle('selected');
+            fileDiv.addEventListener('click', function(e) {
+                const isSelected = this.classList.contains('selected');
+
+                // If the item is not selected, check if the limit has been reached.
+                if (!isSelected) {
+                    const selectedCount = document.querySelectorAll('.selectable.selected').length;
+                    if (selectedCount >= 3) {
+                        alert('You can only select up to 3 files.');
+                        return; // Prevent selection
+                    }
+                }
+
+                this.classList.toggle('selected');
+
+                // Expansion logic for items with functions
+                if (hasFunctions) {
                     // Only expand/collapse if not clicking a link or button inside
                     if (e.target.closest('.expand-indicator') || e.target.closest('.risk-info') || e.target.closest('.risk-score')) {
-                        const expanded = fileDiv.classList.toggle('expanded');
+                        const expanded = this.classList.toggle('expanded');
                         fnContainer.classList.toggle('expanded', expanded);
-                        const indicator = fileDiv.querySelector('.expand-indicator');
+                        const indicator = this.querySelector('.expand-indicator');
                         if (indicator) {
                             indicator.textContent = expanded ? '-' : '+';
                         }
                     }
-                });
-            } else {
-                // For files with no functions, they should still be selectable
-                fileDiv.addEventListener('click', function(e) {
-                    this.classList.toggle('selected');
-                });
-            }
+                }
+            });
             riskItemsContainer.appendChild(fileDiv);
             riskItemsContainer.appendChild(fnContainer);
         });

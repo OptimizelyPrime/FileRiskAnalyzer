@@ -3,18 +3,21 @@ from unittest.mock import patch, MagicMock
 import os
 import tempfile
 import shutil
-from scan.utils.repo_utils import clone_repo, find_source_files
+from common.utils.repo_utils import clone_repo, find_source_files
 
 class TestRepoUtils(unittest.TestCase):
 
     @patch('git.Repo.clone_from')
     def test_clone_repo(self, mock_clone_from):
+        mock_repo = MagicMock()
+        mock_clone_from.return_value = mock_repo
         with tempfile.TemporaryDirectory() as temp_dir:
             with patch('tempfile.mkdtemp', return_value=temp_dir):
                 repo_url = "https://github.com/user/repo.git"
-                cloned_path = clone_repo(repo_url)
-                mock_clone_from.assert_called_once_with(repo_url, temp_dir)
+                repo, cloned_path = clone_repo(repo_url, 'main')
+                mock_clone_from.assert_called_once_with(repo_url, temp_dir, branch='main')
                 self.assertEqual(cloned_path, temp_dir)
+                self.assertEqual(repo, mock_repo)
 
     def test_find_source_files(self):
         with tempfile.TemporaryDirectory() as temp_dir:

@@ -1,5 +1,5 @@
 import unittest
-from scan.utils.churn_utils import calculate_file_churn_score, calculate_repo_churn_scores
+from common.utils.churn_utils import calculate_file_churn_score, calculate_repo_churn_scores
 from datetime import datetime, timedelta
 import pandas as pd
 

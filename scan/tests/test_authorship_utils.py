@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from scan.utils.authorship_utils import get_file_authorship, get_repo_authorship
+from common.utils.authorship_utils import get_file_authorship, get_repo_authorship
 from datetime import datetime
 
 class TestAuthorshipUtils(unittest.TestCase):
 
-    @patch('scan.utils.authorship_utils.Repo')
+    @patch('common.utils.authorship_utils.Repo')
     def test_get_file_authorship(self, mock_repo):
         # Mock the blame data
         mock_commit = MagicMock()
@@ -25,7 +25,7 @@ class TestAuthorshipUtils(unittest.TestCase):
         self.assertEqual(authorship[0]['author'], 'Test Author')
         self.assertEqual(authorship[1]['line'], 'line 2')
 
-    @patch('scan.utils.authorship_utils.get_file_authorship')
+    @patch('common.utils.authorship_utils.get_file_authorship')
     def test_get_repo_authorship(self, mock_get_file_authorship):
         mock_get_file_authorship.return_value = [{'author': 'Test Author'}]
 

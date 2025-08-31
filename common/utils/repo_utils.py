@@ -2,12 +2,12 @@ import tempfile
 from git import Repo
 import os
 
-def clone_repo(repo_url, username=None, token=None):
+def clone_repo(repo_url, branch, username=None, token=None):
     """
     Clones a repository from a HTTPS URL to a temporary directory.
     If username/token are provided, uses them for authentication. Otherwise, attempts to clone as a public repo.
     Returns:
-        str: Path to the cloned repository's temporary directory.
+        tuple: A tuple containing the git.Repo object and the path to the temporary directory.
     """
     temp_dir = tempfile.mkdtemp()
     if repo_url.startswith("https://"):
@@ -18,8 +18,8 @@ def clone_repo(repo_url, username=None, token=None):
     else:
         raise ValueError("Only HTTPS URLs are supported.")
     print(f"Cloning {repo_url} into {temp_dir}...")
-    Repo.clone_from(url_with_auth, temp_dir)
-    return temp_dir
+    repo = Repo.clone_from(url_with_auth, temp_dir, branch=branch)
+    return repo, temp_dir
 
 def find_source_files(repo_path):
     """

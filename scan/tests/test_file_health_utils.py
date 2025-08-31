@@ -1,5 +1,5 @@
 import unittest
-from scan.utils.file_health_utils import calculate_file_health_score
+from common.utils.file_health_utils import calculate_file_health_score
 
 class TestFileHealthUtils(unittest.TestCase):
 

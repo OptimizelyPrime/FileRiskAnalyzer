@@ -1,5 +1,5 @@
 import unittest
-from scan.utils.knowledge_concentration_utils import calculate_knowledge_concentration, calculate_repo_knowledge_concentration
+from common.utils.knowledge_concentration_utils import calculate_knowledge_concentration, calculate_repo_knowledge_concentration
 from datetime import datetime, timedelta
 
 class TestKnowledgeConcentrationUtils(unittest.TestCase):

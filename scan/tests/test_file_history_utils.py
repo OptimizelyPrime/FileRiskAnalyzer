@@ -1,11 +1,11 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from scan.utils.file_history_utils import get_file_commit_history, get_repo_files_commit_history
+from common.utils.file_history_utils import get_file_commit_history, get_repo_files_commit_history
 from datetime import datetime
 
 class TestFileHistoryUtils(unittest.TestCase):
 
-    @patch('scan.utils.file_history_utils.Repo')
+    @patch('common.utils.file_history_utils.Repo')
     def test_get_file_commit_history(self, mock_repo):
         mock_commit = MagicMock()
         mock_commit.hexsha = '12345'
@@ -21,8 +21,8 @@ class TestFileHistoryUtils(unittest.TestCase):
         self.assertEqual(len(history), 1)
         self.assertEqual(history[0]['commit_hash'], '12345')
 
-    @patch('scan.utils.file_history_utils.Repo')
-    @patch('scan.utils.file_history_utils.get_file_commit_history')
+    @patch('common.utils.file_history_utils.Repo')
+    @patch('common.utils.file_history_utils.get_file_commit_history')
     def test_get_repo_files_commit_history(self, mock_get_commit_history, mock_repo):
         # Mock the tree traversal
         mock_blob = MagicMock()

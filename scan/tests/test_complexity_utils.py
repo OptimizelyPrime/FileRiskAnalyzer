@@ -1,10 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock, mock_open
-from scan.utils.complexity_utils import analyze_file_complexity, parse_complexity_report
+from common.utils.complexity_utils import analyze_file_complexity, parse_complexity_report
 
 class TestComplexityUtils(unittest.TestCase):
 
-    @patch('scan.utils.complexity_utils.open', new_callable=mock_open, read_data='def f(): pass')
+    @patch('common.utils.complexity_utils.open', new_callable=mock_open, read_data='def f(): pass')
     @patch('maintainability_score_analyzer.analyze')
     def test_analyze_file_complexity(self, mock_analyze, mock_file_open):
         mock_analyze.return_value = {

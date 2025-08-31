@@ -2,7 +2,7 @@ import tempfile
 from git import Repo
 import os
 
-def clone_repo(repo_url, branch, username=None, token=None):
+def clone_repo(repo_url, branch="main", username=None, token=None):
     """
     Clones a repository from a HTTPS URL to a temporary directory.
     If username/token are provided, uses them for authentication. Otherwise, attempts to clone as a public repo.

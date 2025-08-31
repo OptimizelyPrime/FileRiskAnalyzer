@@ -13,7 +13,7 @@ from generate_dashboard_with_data import generate_dashboard
 def main():
     args = parse_args()
 
-    repo_path = clone_repo(args.repo_url, args.github_username, args.github_token)
+    _, repo_path = clone_repo(args.repo_url, args.branch, username=args.github_username, token=args.github_token)
     source_files = find_source_files(repo_path)
     results = {}
 

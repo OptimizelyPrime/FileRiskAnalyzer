@@ -98,7 +98,17 @@
             margin: 0 0 4px 0;
         }
 
-        .risk-info .file-name {
+        .risk-info .file-path {
+            font-size: 1.0em;
+            opacity: 0.75;
+            margin: 0 0 4px 0;
+            font-style: italic;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .risk-info .file-stats {
             font-size: 1.5em;
             opacity: 0.85;
             margin: 0;
@@ -239,7 +249,9 @@
         const data = [
             // Example:
             // {
-            //   file: 'GameEngine.java',
+            //   full_path: 'path/to/GameEngine.java',
+            //   file_path: 'path/to',
+            //   file_name: 'GameEngine.java',
             //   churn: 1,
             //   knowledge_score: '100.0%',
             //   developer: 'Greg Jeffers',
@@ -265,7 +277,7 @@
             // File-level pill
             const fileDiv = document.createElement('div');
             fileDiv.className = 'risk-item selectable';
-            fileDiv.setAttribute('data-filename', fileObj.file);
+            fileDiv.setAttribute('data-filename', fileObj.full_path);
             fileDiv.style.backgroundColor = '#1a202c'; // Neutral color for file-level
             fileDiv.style.cursor = 'pointer';
 
@@ -280,14 +292,27 @@
             fileDiv.innerHTML = `
                 ${indicatorHTML}
                 <div class="risk-info">
-                    <p class="method-name">${fileObj.file}</p>
-                    <p class="file-name">Churn: ${fileObj.churn} &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score} (${fileObj.developer})</p>
+                    <p class="file-path">${fileObj.file_path}</p>
+                    <p class="method-name">${fileObj.file_name}</p>
+                    <p class="file-stats">Churn: ${fileObj.churn} &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score} (${fileObj.developer})</p>
                 </div>
                 <div class="risk-score">
                     <div style="font-size: 0.8em; opacity: 0.8;">File Risk Score</div>
                     <div style="font-size: 2.0em; color: ${fileRiskColor}; font-weight: 700;">${fileRiskScore}</div>
                 </div>
             `;
+            // Dynamically adjust font size of file path
+            const filePathElement = fileDiv.querySelector('.file-path');
+            if (filePathElement) {
+                const baseFontSize = 1.0; // em
+                const containerWidth = filePathElement.offsetWidth;
+                let textWidth = getTextWidth(fileObj.file_path, `italic ${baseFontSize}em Inter`);
+
+                if (textWidth > containerWidth) {
+                    const newSize = (containerWidth / textWidth) * baseFontSize;
+                    filePathElement.style.fontSize = `${newSize}em`;
+                }
+            }
             // Container for function-level pills
             const fnContainer = document.createElement('div');
             fnContainer.className = 'fn-container';
@@ -306,7 +331,7 @@
                     fnDiv.innerHTML = `
                         <div class="risk-info">
                             <p class="method-name">${fn.function}</p>
-                            <p class="file-name">${fileObj.file}</p>
+                            <p class="file-name">${fileObj.file_name}</p>
                         </div>
                         <div style="margin-left: auto; text-align: right;">
                             <div class="function-metrics-main">
@@ -384,6 +409,14 @@
             if (index < 50) return '#d9534f'; // High Risk (Reddish)
             if (index < 75) return '#f0ad4e'; // Medium Risk (Orangey)
             return '#5cb85c'; // Low Risk (Greenish)
+        }
+
+        function getTextWidth(text, font) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = font;
+            const metrics = context.measureText(text);
+            return metrics.width;
         }
 
         const preparePostBtn = document.getElementById('prepare-post-btn');

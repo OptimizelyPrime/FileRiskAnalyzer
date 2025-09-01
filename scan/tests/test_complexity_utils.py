@@ -61,7 +61,9 @@ class TestComplexityUtils(unittest.TestCase):
 
         self.assertEqual(len(result), 2)
 
-        self.assertEqual(result[0]['file'], 'file1.py')
+        self.assertEqual(result[0]['full_path'], 'file1.py')
+        self.assertEqual(result[0]['file_name'], 'file1.py')
+        self.assertEqual(result[0]['file_path'], '')
         self.assertEqual(result[0]['churn'], 10)
         self.assertEqual(result[0]['knowledge_score'], '80')
         self.assertEqual(result[0]['developer'], 'user@example.com')
@@ -71,7 +73,7 @@ class TestComplexityUtils(unittest.TestCase):
         self.assertEqual(result[0]['functions'][0]['maintainability_index'], 85.0)
         self.assertEqual(result[0]['functions'][0]['cyclomatic_complexity'], 5)
 
-        self.assertEqual(result[1]['file'], 'file2.py')
+        self.assertEqual(result[1]['file_name'], 'file2.py')
         self.assertEqual(result[1]['churn'], 5)
 
 if __name__ == '__main__':

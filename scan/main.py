@@ -47,7 +47,6 @@ def main():
     with open(args.output, "w", encoding="utf-8") as outfile:
         outfile.write("# Repository Complexity and Maintainability Report\n\n")
         for file_path, func_metrics in results.items():
-            file_name = os.path.basename(file_path)
             # File-level metrics
             file_churn = churn_scores.get(file_path, 'N/A')
             file_kc = knowledge_concentration_scores.get(file_path, {})
@@ -65,7 +64,7 @@ def main():
                 kc_val = 0.0
             # Calculate file health score using the new function
             file_health = calculate_file_health_score(func_metrics, churn_val, kc_val)
-            outfile.write(f"## {file_name}\n\n")
+            outfile.write(f"## {file_path}\n\n")
             outfile.write("| Churn | Knowledge Score | Developer | File Health Score |\n")
             outfile.write("|-------|-----------------|-----------|-------------------|\n")
             outfile.write(f"| {churn_val} | {kc_val}% | {file_dev} | {file_health} |\n\n")

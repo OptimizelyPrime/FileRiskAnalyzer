@@ -2,6 +2,7 @@ from typing import List
 import shutil
 from common.utils.repo_utils import clone_repo
 from datetime import datetime
+from .file_extraction import extract_code_from_files
 
 def run(repo_url: str, branch: str, files: List[str]):
     """
@@ -19,6 +20,10 @@ def run(repo_url: str, branch: str, files: List[str]):
         new_branch.checkout()
 
         print(f"Created and checked out new branch: {new_branch_name}")
+
+        extracted_code = extract_code_from_files(temp_dir, files)
+        print("Extracted code:")
+        print(extracted_code)
 
         # In the future, this will:
         # 1. Analyze the specified files

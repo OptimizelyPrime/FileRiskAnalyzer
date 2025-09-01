@@ -17,10 +17,10 @@ def add_risk_to_data(records):
             } for f in record.get('functions', [])
         }
 
-        raw_churn = record.get('churn', 0)
+        raw_churn = float(record.get('churn', '0%'))
 
         try:
-            raw_kc_pct = float(record.get('knowledge_score', '0%').replace('%',''))
+            raw_kc_pct = float(record.get('knowledge_score', '0%'))
         except (ValueError, AttributeError):
             raw_kc_pct = 0.0
 

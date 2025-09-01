@@ -294,25 +294,13 @@
                 <div class="risk-info">
                     <p class="file-path">${fileObj.file_path}</p>
                     <p class="method-name">${fileObj.file_name}</p>
-                    <p class="file-stats">Churn: ${fileObj.churn} &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score} (${fileObj.developer})</p>
+                    <p class="file-stats">Churn: ${fileObj.churn}% &nbsp; | &nbsp; Knowledge Score: ${fileObj.knowledge_score}% (${fileObj.developer})</p>
                 </div>
                 <div class="risk-score">
                     <div style="font-size: 0.8em; opacity: 0.8;">File Risk Score</div>
                     <div style="font-size: 2.0em; color: ${fileRiskColor}; font-weight: 700;">${fileRiskScore}</div>
                 </div>
             `;
-            // Dynamically adjust font size of file path
-            const filePathElement = fileDiv.querySelector('.file-path');
-            if (filePathElement) {
-                const baseFontSize = 1.0; // em
-                const containerWidth = filePathElement.offsetWidth;
-                let textWidth = getTextWidth(fileObj.file_path, `italic ${baseFontSize}em Inter`);
-
-                if (textWidth > containerWidth) {
-                    const newSize = (containerWidth / textWidth) * baseFontSize;
-                    filePathElement.style.fontSize = `${newSize}em`;
-                }
-            }
             // Container for function-level pills
             const fnContainer = document.createElement('div');
             fnContainer.className = 'fn-container';

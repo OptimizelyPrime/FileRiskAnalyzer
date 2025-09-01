@@ -6,9 +6,13 @@
             "name": "Generate Dashboard",
             "type": "debugpy",
             "request": "launch",
-            "program": "scan/generate_dashboard_with_data.py",
+            "module": "scan.generate_dashboard_with_data.py",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "args": []
+            "args": [
+                "repo_url", "https://github.com/OptimizelyPrime/FileRiskAnalyzer"
+            ]            
         },
         {
             "name": "Self-Scan",

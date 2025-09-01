@@ -33,24 +33,24 @@ def main():
     # Calculate knowledge concentration scores (file-level)
     knowledge_concentration_scores = calculate_repo_knowledge_concentration(authorship_data, since=since_dt)
 
-    import os
     for file_path in source_files:
         try:
-            complexity_result = analyze_file_complexity(file_path)
-            file_name = os.path.basename(file_path)
-            results[file_name] = complexity_result
+            absolute_file_path = os.path.join(repo_path, file_path)
+            complexity_result = analyze_file_complexity(absolute_file_path)
+            results[file_path] = complexity_result
         except Exception as e:
-            print(f"[WARN] Skipping {file_path}: {e}")
+            print(f"[WARN] Skipping {absolute_file_path}: {e}")
             continue
         sleep(1)
 
     # Generate a report organized by file, then by function
     with open(args.output, "w", encoding="utf-8") as outfile:
         outfile.write("# Repository Complexity and Maintainability Report\n\n")
-        for file_name, func_metrics in results.items():
+        for file_path, func_metrics in results.items():
+            file_name = os.path.basename(file_path)
             # File-level metrics
-            file_churn = churn_scores.get(file_name, 'N/A')
-            file_kc = knowledge_concentration_scores.get(file_name, {})
+            file_churn = churn_scores.get(file_path, 'N/A')
+            file_kc = knowledge_concentration_scores.get(file_path, {})
             file_dev = file_kc.get('top_author', 'N/A')
             file_kc_pct = file_kc.get('top_author_pct', 0.0)
             # Convert churn to int, default to 0

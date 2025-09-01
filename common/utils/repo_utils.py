@@ -21,19 +21,29 @@ def clone_repo(repo_url, branch="main", username=None, token=None):
         raise ValueError("Only HTTPS URLs or local directory paths are supported.")
     print(f"Cloning {repo_url} into {temp_dir}...")
     repo = Repo.clone_from(url_with_auth, temp_dir, branch=branch)
+
+    # If a .git-blame-ignore-revs file exists in the repo, configure git to use it.
+    ignore_revs_file_path = os.path.join(temp_dir, '.git-blame-ignore-revs')
+    if os.path.exists(ignore_revs_file_path):
+        print(f"Found {ignore_revs_file_path}, configuring git to use it for blame.")
+        with repo.config_writer() as config:
+            config.set_value('blame', 'ignoreRevsFile', '.git-blame-ignore-revs')
+
     return repo, temp_dir
 
 def find_source_files(repo_path):
     """
     Recursively finds all files in the repository path.
     Returns:
-        list: A list of file paths.
+        list: A list of file paths, relative to the repo_path.
     """
     all_files = []
     for root, _, files in os.walk(repo_path):
         for file in files:
             file_path = os.path.join(root, file)
-            if file_path.__contains__('.git'):
+            if '.git' in file_path:
                 continue
-            all_files.append(file_path)
+
+            relative_path = os.path.relpath(file_path, repo_path)
+            all_files.append(relative_path)
     return all_files

@@ -21,6 +21,14 @@ def clone_repo(repo_url, branch="main", username=None, token=None):
         raise ValueError("Only HTTPS URLs or local directory paths are supported.")
     print(f"Cloning {repo_url} into {temp_dir}...")
     repo = Repo.clone_from(url_with_auth, temp_dir, branch=branch)
+
+    # If a .git-blame-ignore-revs file exists in the repo, configure git to use it.
+    ignore_revs_file_path = os.path.join(temp_dir, '.git-blame-ignore-revs')
+    if os.path.exists(ignore_revs_file_path):
+        print(f"Found {ignore_revs_file_path}, configuring git to use it for blame.")
+        with repo.config_writer() as config:
+            config.set_value('blame', 'ignoreRevsFile', '.git-blame-ignore-revs')
+
     return repo, temp_dir
 
 def find_source_files(repo_path):

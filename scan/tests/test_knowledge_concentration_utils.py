@@ -22,20 +22,20 @@ class TestKnowledgeConcentrationUtils(unittest.TestCase):
 
     def test_calculate_repo_knowledge_concentration(self):
         authorship_data = {
-            'file1.py': [
+            'a/file1.py': [
                 {'author': 'A'}, {'author': 'B'}
             ],
-            'file2.py': [
+            'b/file2.py': [
                 {'author': 'C'}, {'author': 'C'}, {'author': 'C'}
             ]
         }
 
         scores = calculate_repo_knowledge_concentration(authorship_data)
 
-        self.assertEqual(scores['file1.py']['top_author'], 'A') # or B, depending on pandas implementation
-        self.assertAlmostEqual(scores['file1.py']['top_author_pct'], 50.0, places=2)
-        self.assertEqual(scores['file2.py']['top_author'], 'C')
-        self.assertAlmostEqual(scores['file2.py']['top_author_pct'], 100.0, places=2)
+        self.assertEqual(scores['a/file1.py']['top_author'], 'A') # or B, depending on pandas implementation
+        self.assertAlmostEqual(scores['a/file1.py']['top_author_pct'], 50.0, places=2)
+        self.assertEqual(scores['b/file2.py']['top_author'], 'C')
+        self.assertAlmostEqual(scores['b/file2.py']['top_author_pct'], 100.0, places=2)
 
 if __name__ == '__main__':
     unittest.main()

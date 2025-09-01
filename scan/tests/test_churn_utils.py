@@ -27,7 +27,7 @@ class TestChurnUtils(unittest.TestCase):
                 {'commit_hash': '1', 'date': (datetime.now() - timedelta(days=1)).isoformat()},
                 {'commit_hash': '2', 'date': (datetime.now() - timedelta(days=2)).isoformat()}
             ],
-            'b/file1.py': [
+            'b/file1.py': [ # This is now a distinct file
                 {'commit_hash': '3', 'date': (datetime.now() - timedelta(days=3)).isoformat()}
             ],
             'file2.py': [

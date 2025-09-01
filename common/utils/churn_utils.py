@@ -2,7 +2,6 @@
 churn_utils.py
 Utility functions for calculating code churn scores using pandas.
 """
-
 import pandas as pd
 from typing import List, Dict, Any, Optional
 from datetime import datetime

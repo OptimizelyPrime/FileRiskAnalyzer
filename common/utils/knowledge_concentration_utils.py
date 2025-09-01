@@ -51,19 +51,17 @@ def calculate_repo_knowledge_concentration(authorship_data: Dict[str, Dict[str, 
     Returns:
         Dict[str, Dict[str, Any]]: Mapping of file paths to function names to knowledge concentration scores.
     """
-    import os
     scores = {}
     for file_path, func_map in authorship_data.items():
-        file_name = os.path.basename(file_path)
         # If func_map is a list, treat as file-level authorship
         if isinstance(func_map, list):
-            scores[file_name] = calculate_knowledge_concentration(func_map, since)
+            scores[file_path] = calculate_knowledge_concentration(func_map, since)
         elif isinstance(func_map, dict):
             # Merge all lines from all functions for file-level metric
             all_lines = []
             for lines in func_map.values():
                 all_lines.extend(lines)
-            scores[file_name] = calculate_knowledge_concentration(all_lines, since)
+            scores[file_path] = calculate_knowledge_concentration(all_lines, since)
         else:
-            scores[file_name] = {'top_author': None, 'top_author_pct': 0.0, 'risk_score': 0.0}
+            scores[file_path] = {'top_author': None, 'top_author_pct': 0.0, 'risk_score': 0.0}
     return scores

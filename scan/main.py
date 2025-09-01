@@ -1,14 +1,14 @@
-from utils.file_health_utils import calculate_file_health_score
+from common.utils.file_health_utils import calculate_file_health_score
 import os
-from arguments import parse_args
-from utils.repo_utils import clone_repo, find_source_files
-from utils.complexity_utils import analyze_file_complexity
-from utils.file_history_utils import get_repo_files_commit_history
-from utils.churn_utils import calculate_repo_churn_scores
-from utils.authorship_utils import get_repo_authorship
-from utils.knowledge_concentration_utils import calculate_repo_knowledge_concentration
+from .arguments import parse_args
+from common.utils.repo_utils import clone_repo, find_source_files
+from common.utils.complexity_utils import analyze_file_complexity
+from common.utils.file_history_utils import get_repo_files_commit_history
+from common.utils.churn_utils import calculate_repo_churn_scores
+from common.utils.authorship_utils import get_repo_authorship
+from common.utils.knowledge_concentration_utils import calculate_repo_knowledge_concentration
 from time import sleep
-from generate_dashboard_with_data import generate_dashboard
+from .generate_dashboard_with_data import generate_dashboard
 
 def main():
     args = parse_args()

@@ -4,19 +4,21 @@ import os
 
 def clone_repo(repo_url, branch="main", username=None, token=None):
     """
-    Clones a repository from a HTTPS URL to a temporary directory.
-    If username/token are provided, uses them for authentication. Otherwise, attempts to clone as a public repo.
+    Clones a repository from a HTTPS URL or a local path to a temporary directory.
+    If username/token are provided, uses them for authentication for HTTPS URLs.
     Returns:
         tuple: A tuple containing the git.Repo object and the path to the temporary directory.
     """
     temp_dir = tempfile.mkdtemp()
-    if repo_url.startswith("https://"):
+    if os.path.isdir(repo_url):
+        url_with_auth = repo_url
+    elif repo_url.startswith("https://"):
         if username and token:
             url_with_auth = repo_url.replace("https://", f"https://{username}:{token}@")
         else:
             url_with_auth = repo_url  # Assume public repo
     else:
-        raise ValueError("Only HTTPS URLs are supported.")
+        raise ValueError("Only HTTPS URLs or local directory paths are supported.")
     print(f"Cloning {repo_url} into {temp_dir}...")
     repo = Repo.clone_from(url_with_auth, temp_dir, branch=branch)
     return repo, temp_dir

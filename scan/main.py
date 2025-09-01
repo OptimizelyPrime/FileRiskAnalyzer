@@ -35,10 +35,11 @@ def main():
 
     for file_path in source_files:
         try:
-            complexity_result = analyze_file_complexity(file_path)
+            absolute_file_path = os.path.join(repo_path, file_path)
+            complexity_result = analyze_file_complexity(absolute_file_path)
             results[file_path] = complexity_result
         except Exception as e:
-            print(f"[WARN] Skipping {file_path}: {e}")
+            print(f"[WARN] Skipping {absolute_file_path}: {e}")
             continue
         sleep(1)
 

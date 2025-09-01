@@ -14,14 +14,13 @@ def get_file_authorship(repo_path: str, file_path: str) -> List[Dict[str, str]]:
 
     Args:
         repo_path (str): Path to the local git repository.
-        file_path (str): Path to the file (relative to repo root).
+        file_path (str): Path to the file, relative to the repo root.
 
     Returns:
         List[Dict[str, str]]: List of dicts with line number, author, and commit hash for each line.
     """
     repo = Repo(repo_path)
-    rel_path = os.path.relpath(file_path, repo_path)
-    blame_data = repo.blame('HEAD', rel_path)
+    blame_data = repo.blame('HEAD', file_path)
     authorship = []
     line_num = 1
     for commit, lines in blame_data:

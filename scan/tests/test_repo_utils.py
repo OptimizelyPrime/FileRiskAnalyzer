@@ -55,11 +55,12 @@ class TestRepoUtils(unittest.TestCase):
 
             found_files = find_source_files(temp_dir)
 
-            # Use relative paths for comparison
-            relative_files = sorted([os.path.relpath(p, temp_dir) for p in found_files])
+            # The function now returns relative paths directly
+            relative_files = sorted(found_files)
 
             self.assertEqual(len(relative_files), 2)
             self.assertIn('file1.py', relative_files)
+            # Use os.path.join to be OS-agnostic
             self.assertIn(os.path.join('dir1', 'file2.py'), relative_files)
 
 if __name__ == '__main__':

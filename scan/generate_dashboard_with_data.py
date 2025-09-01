@@ -5,8 +5,8 @@ import json
 import time
 import re
 
-TEMPLATE_PATH = os.path.join(os.getcwd(), "dashboard_template.html")
-REPORT_PATH = os.path.join(os.getcwd(), "complexity_report.md")
+TEMPLATE_PATH = os.path.join(os.getcwd(), "scan\\dashboard_template.html")
+REPORT_PATH = os.path.join(os.getcwd(), "scan\\complexity_report.md")
 
 def add_risk_to_data(records):
     for record in records:
@@ -49,7 +49,7 @@ def generate_dashboard(repo_url=None):
         html_out = html_out.replace("||REPO_URL||", repo_url)
 
     ts = time.strftime("%Y%m%d_%H%M%S")
-    out_path = os.path.join(os.getcwd(), f"generated_dashboard_{ts}.html")
+    out_path = os.path.join(os.getcwd(), f"scan\\generated_dashboard_{ts}.html")
 
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html_out)

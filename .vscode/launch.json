@@ -3,34 +3,24 @@
     "configurations": [
 
         {
-            "name": "TDA",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "scan/main.py",
-            "console": "integratedTerminal",
-            "args": [
-                "--github-username", "optimizelyprime",
-                "--github-token", "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",
-                "--repo-url", "https://github.com/OptimizelyPrime/ComplexCode"
-            ]
-        },
-        {
-            "name": "Self-Scan",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "scan/main.py",
-            "console": "integratedTerminal",
-            "args": [
-                "--repo-url", "https://github.com/OptimizelyPrime/FileRiskAnalyzer"
-            ]
-        },
-        {
             "name": "Generate Dashboard",
             "type": "debugpy",
             "request": "launch",
             "program": "scan/generate_dashboard_with_data.py",
             "console": "integratedTerminal",
             "args": []
+        },
+        {
+            "name": "Self-Scan",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scan.main",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "args": [
+                "--repo-url", "https://github.com/OptimizelyPrime/FileRiskAnalyzer"
+            ]
         }
     ]
 }

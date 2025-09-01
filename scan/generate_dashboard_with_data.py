@@ -1,5 +1,5 @@
-from utils.file_health_utils import calculate_file_health_score
-from utils.complexity_utils import parse_complexity_report
+from common.utils.file_health_utils import calculate_file_health_score
+from common.utils.complexity_utils import parse_complexity_report
 import os
 import json
 import time

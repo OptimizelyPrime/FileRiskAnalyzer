@@ -14,7 +14,7 @@ keys.json
 
 # Ignore generated reports
 complexity_report.md
-
+generated_dashboard_*.html
 # Python build files:
 *.pyc
 __pycache__/

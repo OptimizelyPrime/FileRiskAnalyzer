@@ -41,9 +41,7 @@ def calculate_repo_churn_scores(file_histories: Dict[str, List[Dict[str, str]]],
     Returns:
         Dict[str, int]: Mapping of file names to churn scores.
     """
-    import os
     churn_scores = {}
     for file_path, history in file_histories.items():
-        file_name = os.path.basename(file_path)
-        churn_scores[file_name] = calculate_file_churn_score(history, since)
+        churn_scores[file_path] = calculate_file_churn_score(history, since)
     return churn_scores

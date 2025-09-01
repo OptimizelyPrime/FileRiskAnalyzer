@@ -59,11 +59,9 @@ def get_function_line_map(file_paths: List[str]) -> Dict[str, Dict[str, List[int
                     'end_line': None,
                     'lines': []
                 }
-            file_name = os.path.basename(file_path)
-            function_line_map[file_name] = file_func_lines
+            function_line_map[file_path] = file_func_lines
         except Exception:
-            file_name = os.path.basename(file_path)
-            function_line_map[file_name] = {}
+            function_line_map[file_path] = {}
     return function_line_map
 """
 complexity_utils.py
@@ -159,6 +157,7 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
                                and its complexity metrics.
     """
     import re
+    import os
     files_data = []
 
     # Regex to split the report by file sections
@@ -176,7 +175,9 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
         if not file_match:
             continue
 
-        file_name = file_match.group(1).strip()
+        full_path = file_match.group(1).strip()
+        file_path = os.path.dirname(full_path)
+        file_name = os.path.basename(full_path)
 
         # Extract churn, knowledge score, and developer
         churn_table_match = re.search(r'\| Churn \| Knowledge Score \| Developer \| File Health Score \|\n\|-+\|-+\|-+\|-+\|\n\| (.*?) \| (.*?)% \| (.*?) \| (.*?) \|', section)
@@ -208,7 +209,9 @@ def parse_complexity_report(report_content: str) -> List[Dict[str, Any]]:
             })
 
         files_data.append({
-            "file": file_name,
+            "full_path": full_path,
+            "file_path": file_path,
+            "file_name": file_name,
             "churn": int(churn),
             "knowledge_score": knowledge_score,
             "developer": developer,

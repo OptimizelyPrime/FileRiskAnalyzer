@@ -9,3 +9,4 @@ pandas
 langchain_openai
 git+https://github.com/OptimizelyPrime/MainScoreCalc.git
 esprima
+pytest

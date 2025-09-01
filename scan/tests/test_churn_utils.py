@@ -21,14 +21,16 @@ class TestChurnUtils(unittest.TestCase):
 
     def test_calculate_repo_churn_scores(self):
         file_histories = {
-            'file1.py': [{'commit_hash': '1'}, {'commit_hash': '2'}],
-            'file2.py': [{'commit_hash': '3'}]
+            'a/file1.py': [{'commit_hash': '1'}, {'commit_hash': '2'}],
+            'b/file1.py': [{'commit_hash': '3'}],
+            'file2.py': [{'commit_hash': '4'}]
         }
 
         churn_scores = calculate_repo_churn_scores(file_histories)
 
-        self.assertEqual(len(churn_scores), 2)
-        self.assertEqual(churn_scores['file1.py'], 2)
+        self.assertEqual(len(churn_scores), 3)
+        self.assertEqual(churn_scores['a/file1.py'], 2)
+        self.assertEqual(churn_scores['b/file1.py'], 1)
         self.assertEqual(churn_scores['file2.py'], 1)
 
 if __name__ == '__main__':

@@ -69,6 +69,6 @@ def calculate_repo_churn_scores(file_histories: Dict[str, List[Dict[str, str]]],
 
     for file_path, history in file_histories.items():
         # The file-level calculation also filters by 'since', so we pass it down.
-        churn_scores[file_path.replace('/', '\\')] = calculate_file_churn_score(history, total_repo_commits, since)
+        churn_scores[file_path] = calculate_file_churn_score(history, total_repo_commits, since)
 
     return churn_scores

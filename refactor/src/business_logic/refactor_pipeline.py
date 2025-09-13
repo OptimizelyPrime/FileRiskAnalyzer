@@ -49,10 +49,16 @@ def run(repo_url: str, branch: str, files: List[str]):
 
         save_refactored_code(temp_dir, refactored_code)
 
-        # In the future, this will:
-        # 1. Analyze the specified files
-        # 2. Perform refactoring
-        # 3. Push the changes back to the repository
+        print("Committing and pushing changes...")
+        try:
+            repo.git.add(all=True)
+            repo.index.commit("AI-powered refactoring")
+            origin = repo.remote(name='origin')
+            origin.push(new_branch_name)
+            print(f"Pushed changes to branch {new_branch_name}")
+            print(f"Please create a pull request for the branch '{new_branch_name}' manually.")
+        except Exception as e:
+            print(f"Error committing or pushing changes: {e}")
     finally:
         if temp_dir and shutil.os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)

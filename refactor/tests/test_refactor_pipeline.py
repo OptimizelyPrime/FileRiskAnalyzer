@@ -15,10 +15,11 @@ class TestRefactorPipeline(unittest.TestCase):
     @patch('refactor.src.business_logic.refactor_pipeline.extract_code_from_files')
     @patch('refactor.src.business_logic.refactor_pipeline.refactor_code_using_gemini')
     @patch('refactor.src.business_logic.refactor_pipeline.save_refactored_code')
+    @patch('refactor.src.business_logic.refactor_pipeline.create_pull_request')
     @patch('shutil.rmtree')
     @patch('os.path.exists', return_value=True)
     @patch('refactor.src.business_logic.refactor_pipeline.datetime')
-    def test_run_pipeline(self, mock_datetime, mock_exists, mock_rmtree, mock_save_refactored_code, mock_refactor_code, mock_extract_code, mock_clone_repo):
+    def test_run_pipeline(self, mock_datetime, mock_exists, mock_rmtree, mock_create_pr, mock_save_refactored_code, mock_refactor_code, mock_extract_code, mock_clone_repo):
         # Arrange
         mock_repo = MagicMock()
         mock_remote = MagicMock()
@@ -50,6 +51,7 @@ class TestRefactorPipeline(unittest.TestCase):
         mock_repo.git.add.assert_called_once_with(all=True)
         mock_repo.index.commit.assert_called_once_with("AI-powered refactoring")
         mock_remote.push.assert_called_once_with(expected_branch_name)
+        mock_create_pr.assert_called_once_with(repo_url, expected_branch_name, branch)
         mock_rmtree.assert_called_once_with('temp_dir')
 
 if __name__ == '__main__':

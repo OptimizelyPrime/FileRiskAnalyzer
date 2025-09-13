@@ -5,3 +5,4 @@ GitPython
 langchain
 google-generativeai
 langchain-google-genai
+requests

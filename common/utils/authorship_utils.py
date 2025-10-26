@@ -1,4 +1,3 @@
-```python
 """
 authorship_utils.py
 Utility functions for extracting authorship data using GitPython.
@@ -55,4 +54,3 @@ def get_repo_authorship(repo_path: str, file_paths: List[str]) -> Dict[str, List
         file_path: get_file_authorship(repo_path, file_path)
         for file_path in file_paths
     }
-```

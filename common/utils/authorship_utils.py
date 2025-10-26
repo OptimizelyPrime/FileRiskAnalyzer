@@ -21,12 +21,6 @@ def get_file_authorship(repo_path: str, file_path: str) -> List[Dict[str, str]]:
     repo = Repo(repo_path)
     blame_data = repo.blame('HEAD', file_path)
 
-    flat_blame = (
-        (commit, line)
-        for commit, lines in blame_data
-        for line in lines
-    )
-
     return [
         {
             'line_number': line_num,
@@ -35,7 +29,14 @@ def get_file_authorship(repo_path: str, file_path: str) -> List[Dict[str, str]]:
             'date': commit.committed_datetime.isoformat(),
             'line': line.strip(),
         }
-        for line_num, (commit, line) in enumerate(flat_blame, 1)
+        for line_num, (commit, line) in enumerate(
+            (
+                (commit, line)
+                for commit, lines in blame_data
+                for line in lines
+            ),
+            1,
+        )
     ]
 
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="repo-url" content="||REPO_URL||">
+    <meta name="branch" content="||BRANCH||">
     <title>Repository Risk Analysis Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,6 +222,12 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
+        #prepare-post-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
     </style>
 </head>
 <body>
@@ -235,7 +242,7 @@
         </div>
     </div>
 
-    <button id="prepare-post-btn">Submit for Refactoring</button>
+    <button id="prepare-post-btn" disabled>Submit for Refactoring</button>
 
     <div class="modal" id="modal">
         <div class="modal-content">
@@ -353,6 +360,8 @@
                 }
 
                 this.classList.toggle('selected');
+                // Update submit button enabled state after selection changes
+                updateSubmitButtonState();
 
                 // Expansion logic for items with functions
                 if (hasFunctions) {
@@ -407,6 +416,15 @@
             return metrics.width;
         }
 
+        // Enable/disable submit button based on selection count
+        function updateSubmitButtonState() {
+            const selectedCount = document.querySelectorAll('.selectable.selected').length;
+            const btn = document.getElementById('prepare-post-btn');
+            if (btn) {
+                btn.disabled = selectedCount === 0;
+            }
+        }
+
         const preparePostBtn = document.getElementById('prepare-post-btn');
         preparePostBtn.addEventListener('click', () => {
             const selectedPills = document.querySelectorAll('.selectable.selected');
@@ -415,10 +433,18 @@
                 selectedFiles.push(pill.getAttribute('data-filename'));
             });
 
+            // Guard: prevent sending when no files are selected
+            if (selectedFiles.length === 0) {
+                alert('Please select at least one file to submit.');
+                return;
+            }
+
             const repoUrl = document.querySelector('meta[name="repo-url"]').getAttribute('content');
+            const branch = document.querySelector('meta[name="branch"]').getAttribute('content');
 
             const payload = {
                 repo_url: repoUrl,
+                branch: branch,
                 files: selectedFiles
             };
 

@@ -1,6 +1,10 @@
 from common.utils.file_health_utils import calculate_file_health_score
 import os
-from .arguments import parse_args
+try:
+    from .arguments import parse_args
+except ImportError:
+    # Fallback when running as a script (not as a module)
+    from scan.arguments import parse_args
 from common.utils.repo_utils import clone_repo, find_source_files
 from common.utils.complexity_utils import analyze_file_complexity
 from common.utils.file_history_utils import get_repo_files_commit_history
@@ -86,7 +90,7 @@ def main():
                     outfile.write("No additional metrics available.\n\n")
         outfile.write("\n\n")
 
-    generate_dashboard(args.repo_url)
+    generate_dashboard(args.repo_url, args.branch)
 
 if __name__ == "__main__":
     main()

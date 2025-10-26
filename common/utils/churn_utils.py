@@ -1,11 +1,32 @@
 """
 churn_utils.py
-Utility functions for calculating code churn scores using pandas.
+Utility functions for calculating code churn scores without heavy dependencies.
 """
-import pandas as pd
-from typing import List, Dict, Any, Optional
-from datetime import datetime
+from typing import List, Dict, Any, Optional, Set
+from datetime import datetime, timezone
 
+
+
+def _parse_datetime(value: Any) -> Optional[datetime]:
+    """Best-effort ISO parser that tolerates timezone 'Z'."""
+    if isinstance(value, datetime):
+        return value
+    if value is None:
+        return None
+    try:
+        s = str(value)
+        if s.endswith('Z'):
+            s = s[:-1] + '+00:00'
+        return datetime.fromisoformat(s)
+    except Exception:
+        return None
+
+def _to_aware_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def calculate_file_churn_score(commit_history: List[Dict[str, str]], total_commits: int, since: Optional[str] = None) -> float:
@@ -20,14 +41,20 @@ def calculate_file_churn_score(commit_history: List[Dict[str, str]], total_commi
     Returns:
         float: Normalized churn score as a percentage.
     """
-    df = pd.DataFrame(commit_history)
-    if since:
-        since_dt = pd.to_datetime(since)
-        if 'date' in df:
-            df['date'] = pd.to_datetime(df['date'])
-            df = df[df['date'] >= since_dt]
+    since_dt = _to_aware_utc(_parse_datetime(since)) if since is not None else None
 
-    file_commits = df['commit_hash'].nunique() if 'commit_hash' in df else 0
+    commits: Set[str] = set()
+    for entry in commit_history or []:
+        commit_hash = entry.get('commit_hash') if isinstance(entry, dict) else None
+        if not commit_hash:
+            continue
+        if since_dt is not None:
+            dt = _to_aware_utc(_parse_datetime(entry.get('date'))) if isinstance(entry, dict) else None
+            if dt is None or dt < since_dt:
+                continue
+        commits.add(commit_hash)
+
+    file_commits = len(commits)
 
     if total_commits == 0:
         return 0.0
@@ -47,28 +74,25 @@ def calculate_repo_churn_scores(file_histories: Dict[str, List[Dict[str, str]]],
     Returns:
         Dict[str, float]: Mapping of file names to normalized churn scores (%).
     """
-    churn_scores = {}
+    churn_scores: Dict[str, float] = {}
 
-    # First, determine the total number of unique commits in the given histories, respecting 'since'
-    all_commits_df_list = []
-    for history in file_histories.values():
-        all_commits_df_list.append(pd.DataFrame(history))
+    # Determine the total number of unique commits in the given histories, respecting 'since'
+    since_dt = _to_aware_utc(_parse_datetime(since)) if since is not None else None
+    repo_commits: Set[str] = set()
+    for history in (file_histories or {}).values():
+        for entry in history or []:
+            commit_hash = entry.get('commit_hash') if isinstance(entry, dict) else None
+            if not commit_hash:
+                continue
+            if since_dt is not None:
+                dt = _to_aware_utc(_parse_datetime(entry.get('date'))) if isinstance(entry, dict) else None
+                if dt is None or dt < since_dt:
+                    continue
+            repo_commits.add(commit_hash)
 
-    if not all_commits_df_list:
-        return {}
+    total_repo_commits = len(repo_commits)
 
-    repo_df = pd.concat(all_commits_df_list)
-
-    if since:
-        since_dt = pd.to_datetime(since)
-        if 'date' in repo_df:
-            repo_df['date'] = pd.to_datetime(repo_df['date'])
-            repo_df = repo_df[repo_df['date'] >= since_dt]
-
-    total_repo_commits = repo_df['commit_hash'].nunique() if 'commit_hash' in repo_df else 0
-
-    for file_path, history in file_histories.items():
-        # The file-level calculation also filters by 'since', so we pass it down.
+    for file_path, history in (file_histories or {}).items():
         churn_scores[file_path] = calculate_file_churn_score(history, total_repo_commits, since)
 
     return churn_scores

@@ -30,7 +30,7 @@ def add_risk_to_data(records):
 
     return records
 
-def generate_dashboard(repo_url=None):
+def generate_dashboard(repo_url=None, branch=None):
     with open(REPORT_PATH, encoding="utf-8") as f:
         report_content = f.read()
 
@@ -47,6 +47,8 @@ def generate_dashboard(repo_url=None):
     html_out = template.replace("||DATA||", js_records)
     if repo_url:
         html_out = html_out.replace("||REPO_URL||", repo_url)
+    if branch:
+        html_out = html_out.replace("||BRANCH||", branch)
 
     ts = time.strftime("%Y%m%d_%H%M%S")
     out_path = os.path.join(os.getcwd(), f"scan\\generated_dashboard_{ts}.html")

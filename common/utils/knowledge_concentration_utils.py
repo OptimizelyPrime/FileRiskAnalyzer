@@ -1,12 +1,31 @@
 """
 knowledge_concentration_utils.py
-Utility functions for scoring knowledge concentration risk using pandas.
+Utility functions for scoring knowledge concentration risk without heavy dependencies.
 """
 
-import pandas as pd
 from typing import List, Dict, Any, Optional
-from datetime import datetime
-import pytz
+from datetime import datetime, timezone
+
+
+def _parse_datetime(value) -> Optional[datetime]:
+    if isinstance(value, datetime):
+        return value
+    if value is None:
+        return None
+    try:
+        s = str(value)
+        if s.endswith('Z'):
+            s = s[:-1] + '+00:00'
+        return datetime.fromisoformat(s)
+    except Exception:
+        return None
+
+def _to_aware_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
 
 
 def calculate_knowledge_concentration(authorship_data: List[Dict[str, str]], since: Optional[datetime] = None) -> Dict[str, Any]:
@@ -20,17 +39,36 @@ def calculate_knowledge_concentration(authorship_data: List[Dict[str, str]], sin
     Returns:
         Dict[str, Any]: Dict with top author, percentage, and risk score (0-1).
     """
-    df = pd.DataFrame(authorship_data)
-    if since:
-        since_utc = since.replace(tzinfo=pytz.UTC)
-        if 'date' in df:
-            df['date'] = pd.to_datetime(df['date'], utc=True)
-            df = df[df['date'] >= since_utc]
-    if df.empty or 'author' not in df:
+    # Optional filter by since; exclude entries without a parseable date when filtering is requested
+    rows = authorship_data or []
+    if since is not None:
+        since_dt = _to_aware_utc(_parse_datetime(since))
+        if since_dt is not None:
+            filtered = []
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                dt = _to_aware_utc(_parse_datetime(row.get('date')))
+                if dt is not None and dt >= since_dt:
+                    filtered.append(row)
+            rows = filtered
+
+    # Count authors
+    author_counts: Dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        author = row.get('author')
+        if author is None:
+            continue
+        author_counts[author] = author_counts.get(author, 0) + 1
+
+    total = sum(author_counts.values())
+    if total == 0:
         return {'top_author': None, 'top_author_pct': 0.0, 'risk_score': 0.0}
-    author_counts = df['author'].value_counts()
-    top_author = author_counts.idxmax()
-    top_author_pct = author_counts.max() / len(df)
+
+    top_author = max(author_counts, key=lambda a: author_counts[a])
+    top_author_pct = author_counts[top_author] / total
     # Risk score: higher percentage = higher risk (siloed knowledge)
     risk_score = top_author_pct
     return {

@@ -1,6 +1,8 @@
 from typing import List, Dict
 import shutil
 import os
+import json
+import stat
 from datetime import datetime
 import requests
 
@@ -26,7 +28,32 @@ def save_refactored_code(repo_path: str, refactored_code: Dict[str, str]):
             print(f"Error saving file {full_path}: {e}")
 
 
-def create_pull_request(repo_url: str, head: str, base: str):
+def _load_github_credentials():
+    """Load GitHub credentials from refactor/keys.json or env vars.
+
+    Returns (username, token) where username defaults to 'x-access-token' if only a token is provided.
+    """
+    keys_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "keys.json"))
+    username = None
+    token = None
+    try:
+        if os.path.exists(keys_path):
+            with open(keys_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                token = data.get("github_token") or data.get("GITHUB_TOKEN") or token
+                username = data.get("github_username") or username
+    except Exception as e:
+        print(f"Warning: failed to read GitHub credentials from {keys_path}: {e}")
+
+    # Fallbacks
+    if not token:
+        token = os.getenv("GITHUB_TOKEN")
+    if token and not username:
+        username = "x-access-token"
+    return username, token
+
+
+def create_pull_request(repo_url: str, head: str, base: str, token: str | None = None):
     """Create a pull request on GitHub for the refactored branch.
 
     Args:
@@ -34,9 +61,10 @@ def create_pull_request(repo_url: str, head: str, base: str):
         head: Name of the branch containing the changes.
         base: Name of the branch to merge into.
     """
-    token = os.getenv("GITHUB_TOKEN")
     if not token:
-        print("GITHUB_TOKEN not set; skipping pull request creation.")
+        _, token = _load_github_credentials()
+    if not token:
+        print("GitHub token not available; skipping pull request creation.")
         return
 
     try:
@@ -64,6 +92,17 @@ def create_pull_request(repo_url: str, head: str, base: str):
     except Exception as e:
         print(f"Error while creating pull request: {e}")
 
+def _handle_remove_readonly(func, path, exc_info):
+    try:
+        os.chmod(path, stat.S_IWRITE)
+    except Exception:
+        pass
+    try:
+        func(path)
+    except Exception as e:
+        print(f"onerror removing {path}: {e}")
+
+
 def run(repo_url: str, branch: str, files: List[str]):
     """
     This function will contain the core business logic for the refactoring pipeline.
@@ -71,7 +110,10 @@ def run(repo_url: str, branch: str, files: List[str]):
     repo, temp_dir = None, None
     try:
         print(f"Refactoring process initiated for repo: {repo_url}, branch: {branch}, files: {files}")
-        repo, temp_dir = clone_repo(repo_url, branch)
+        gh_user, gh_token = _load_github_credentials()
+        if gh_token:
+            print("Using GitHub token from keys.json/env for cloning and pushing.")
+        repo, temp_dir = clone_repo(repo_url, branch, username=gh_user, token=gh_token)
         print(f"Cloned repo to {temp_dir}")
 
         date_stamp = datetime.now().strftime("%Y%m%d")
@@ -97,10 +139,21 @@ def run(repo_url: str, branch: str, files: List[str]):
             origin = repo.remote(name='origin')
             origin.push(new_branch_name)
             print(f"Pushed changes to branch {new_branch_name}")
-            create_pull_request(repo_url, new_branch_name, branch)
+            create_pull_request(repo_url, new_branch_name, branch, token=gh_token)
         except Exception as e:
             print(f"Error committing or pushing changes: {e}")
     finally:
-        if temp_dir and shutil.os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)
-            print(f"Cleaned up temporary directory {temp_dir}")
+        try:
+            if repo is not None:
+                # Ensure GitPython closes any file handles before removal (Windows)
+                try:
+                    repo.close()
+                except Exception as e:
+                    print(f"Error closing repo: {e}")
+        finally:
+            if temp_dir and os.path.exists(temp_dir):
+                try:
+                    shutil.rmtree(temp_dir, onerror=_handle_remove_readonly)
+                    print(f"Cleaned up temporary directory {temp_dir}")
+                except Exception as e:
+                    print(f"Failed to remove temporary directory {temp_dir}: {e}")
